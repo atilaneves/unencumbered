@@ -1,0 +1,12 @@
+{
+    "name": "unencumbered",
+    "description": "Support for Cucumber to write step descriptions in D",
+    "copyright": "Copyright (C) 2014 Me. All rights reserved.",
+    "homepage": "https://github.com/atilaneves/unencumbered",
+    "authors": ["Atila Neves"],
+    "license": "BSD 3-clause",
+    "targetType": "executable",
+    "dependencies": {
+        "vibe-d": "~master"
+    }
+}
