@@ -48,6 +48,6 @@ void handle(TCPConnection tcpConnection, in string request) {
         tcpConnection.send(`["success"]`);
     } else  {
         debug writeln("oops");
-        tcpConnection.send(`["",[]]`);
+        tcpConnection.send(`["success"]`);
     }
 }
