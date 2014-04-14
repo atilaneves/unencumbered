@@ -3,15 +3,15 @@ module CucumberDMappings
     "features"
   end
 
+  def run_feature
+    compile
+    run('/tmp/foo')
+  end
+
   def write_passing_mapping(step_name)
     add_src <<-EOF
         writeln("1 scenario (1 passed)");
 EOF
-  end
-
-  def run_feature
-    compile
-    run('/tmp/foo')
   end
 
   def assert_passing_scenario
@@ -42,7 +42,9 @@ EOF
   end
 
   def assert_undefined_scenario
-    pending "Not implemented yet"
+    pending
+    assert_partial_output("1 scenario (1 undefined)", all_output)
+    assert_success true
   end
 
   def failed_output
@@ -99,7 +101,7 @@ EOF
   end
 
   def run_feature_with_tags(*tag_groups)
-    write_file('foo.d', @code);
+    pending
   end
 
   def assert_executed_scenarios(*scenario_offsets)
