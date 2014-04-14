@@ -1,3 +1,5 @@
+module cucumber.app;
+
 import vibe.d;
 import std.stdio;
 import std.string;
