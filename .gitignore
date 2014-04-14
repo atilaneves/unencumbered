@@ -1,3 +1,5 @@
 unencumbered
 \.dub
 tmp
+foo
+foo\.o
