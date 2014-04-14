@@ -8,5 +8,20 @@
     "targetType": "executable",
     "dependencies": {
         "vibe-d": "~master"
-    }
+    },
+    "configurations": [
+        { "name": "executable",
+          "versions": ["VibeDefaultMain"]
+        },
+        { "name": "unittest",
+          "targetType": "executable",
+          "sourcePaths": ["tests"],
+          "mainSourceFile": "tests/ut.d",
+          "dependencies": {
+              "unit-threaded": "~master"
+          },
+          "excludedSourceFiles": ["source/cucumber/app.d"],
+          "versions": ["VibeCustomMain"]
+        }
+    ]
 }

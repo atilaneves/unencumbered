@@ -4,13 +4,15 @@ module CucumberDMappings
   end
 
   def run_feature
-    compile
-    run('/tmp/foo')
+    write_src
+    source_path = get_absolute_path("../source")
+    run("rdmd -I#{source_path} /tmp/foo 2>&1")
   end
 
   def write_passing_mapping(step_name)
+    puts "step is #{step_name}"
     add_src <<-EOF
-        writeln("1 scenario (1 passed)");
+        Match!(r\"#{step_name}\");
 EOF
   end
 
@@ -144,6 +146,7 @@ EOF
 
   def add_src(code)
     @code ||= <<-EOF
+import cucumber.match;
 import std.stdio;
 int main() {
     try {
@@ -158,6 +161,8 @@ EOF
         return 1;
     }
 
+    writeln(getNumScenarios, " scenario (", getNumPassed, " passed)");
+
     return 0;
 }
 EOF
@@ -167,11 +172,14 @@ EOF
 
   def compile()
     write_src
-    in_current_dir do
-      compiler_output = %x[ dmd /tmp/foo.d -of/tmp/foo 2>&1 ]
-      expect($?.success?).to be_true, "Compilation failed! Output:\n#{compiler_output}\nCode:\n#{@code}\n"
-    end
+    compiler_output = %x[ dmd -Isource /tmp/foo.d 2>&1 ]
+    expect($?.success?).to be_true, "Compilation failed! Output:\n#{compiler_output}\nCode:\n#{@code}\n"
   end
+
+  def get_absolute_path(relative_path)
+    File.expand_path(relative_path, File.dirname(__FILE__))
+  end
+
 end
 
 World(CucumberDMappings)
