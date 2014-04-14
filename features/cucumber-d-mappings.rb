@@ -4,26 +4,19 @@ module CucumberDMappings
   end
 
   def write_passing_mapping(step_name)
-    @code ||= <<-EOF
-import std.stdio;
-void main() {
-    writeln("1 scenario (1 passed)");
-}
+    add_src <<-EOF
+writeln("1 scenario (1 passed)");
 EOF
   end
 
   def run_feature
-    write_file('foo.d', @code);
-    in_current_dir do
-        expect( File.exist? 'foo.d' ).to be_true
-        compile
-      end
+    compile
     run('/tmp/foo')
   end
 
   def assert_passing_scenario
     assert_partial_output("1 scenario (1 passed)", all_output)
-#    assert_success true
+    assert_success true
   end
 
   def write_failing_mapping(step_name)
@@ -59,10 +52,7 @@ EOF
   end
 
   def write_mappings_for_calculator
-    @code += <<-EOF
-void given() {
-}
-EOF
+    pending
   end
 
   def write_custom_world_constructor
@@ -144,9 +134,26 @@ EOF
 
   private
 
+  def add_src(code)
+    @code ||= <<-EOF
+import std.stdio;
+void main() {
+EOF
+    @code += code
+  end
+
+  def write_src
+    add_src "}"
+    write_file('/tmp/foo.d', @code)
+    puts "code is \n#{@code}\n"
+  end
+
   def compile()
-    compiler_output = %x[ dmd foo.d -of/tmp/foo 2>&1 ]
-    expect($?.success?).to be_true, "Compilation failed! Output:\n#{compiler_output}"
+    write_src
+    in_current_dir do
+      compiler_output = %x[ dmd /tmp/foo.d -of/tmp/foo 2>&1 ]
+      expect($?.success?).to be_true, "Compilation failed! Output:\n#{compiler_output}\nCode:\n#{@code}\n"
+    end
   end
 end
 
