@@ -15,7 +15,6 @@ void accept(TCPConnection tcpConnection) {
             // auto bytes = new ubyte[tcpConnection.leastSize];
             // tcpConnection.read(bytes);
             auto bytes = tcpConnection.readLine(size_t.max, "\n");
-            debug writeln("Read ", bytes.length, " bytes");
             handle(tcpConnection, (cast(string)bytes).strip());
         }
     });
@@ -30,5 +29,10 @@ void send(TCPConnection tcpConnection, in string str) {
 }
 
 void handle(TCPConnection tcpConnection, in string request) {
-    tcpConnection.send(`["success",[]]`);
+    debug writeln("\nRequest:\n", request, "\n");
+    if(request == `["begin_scenario",{"tags":["wire"]}]`) tcpConnection.send(`["success"]`);
+    else {
+        debug writeln("oops");
+        tcpConnection.send(`["success",[]]`);
+    }
 }
