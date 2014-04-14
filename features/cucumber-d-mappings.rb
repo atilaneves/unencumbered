@@ -5,7 +5,7 @@ module CucumberDMappings
 
   def write_passing_mapping(step_name)
     add_src <<-EOF
-writeln("1 scenario (1 passed)");
+        writeln("1 scenario (1 passed)");
 EOF
   end
 
@@ -20,11 +20,14 @@ EOF
   end
 
   def write_failing_mapping(step_name)
-    pending "Not implemented yet"
+    add_src <<-EOF
+        throw new Exception("Failing mapping for " ~ "#{step_name}");
+EOF
   end
 
   def assert_failing_scenario
-    pending "Not implemented yet"
+    assert_partial_output("1 scenario (1 failed)", all_output)
+    assert_success false
   end
 
   def write_pending_mapping(step_name)
@@ -137,13 +140,22 @@ EOF
   def add_src(code)
     @code ||= <<-EOF
 import std.stdio;
-void main() {
+int main() {
+    try {
 EOF
     @code += code
   end
 
   def write_src
-    add_src "}"
+    add_src <<-EOF
+    } catch(Exception) {
+        writeln("1 scenario (1 failed)");
+        return 1;
+    }
+
+    return 0;
+}
+EOF
     write_file('/tmp/foo.d', @code)
     puts "code is \n#{@code}\n"
   end
