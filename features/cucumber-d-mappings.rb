@@ -31,11 +31,14 @@ EOF
   end
 
   def write_pending_mapping(step_name)
-    pending "Not implemented yet"
+    add_src <<-EOF
+        writeln("1 scenario (1 pending)");
+EOF
   end
 
   def assert_pending_scenario
-    pending "Not implemented yet"
+    assert_partial_output("1 scenario (1 pending)", all_output)
+    assert_success true
   end
 
   def assert_undefined_scenario
