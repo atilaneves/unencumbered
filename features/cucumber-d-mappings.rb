@@ -34,7 +34,7 @@ EOF
 
   def write_pending_mapping(step_name)
     add_src <<-EOF
-        writeln("1 scenario (1 pending)");
+        Match!(r\"#{step_name}\")(Yes.Pending);
 EOF
   end
 
@@ -148,6 +148,7 @@ EOF
     @code ||= <<-EOF
 import cucumber.match;
 import std.stdio;
+import std.conv;
 int main() {
     try {
 EOF
@@ -161,7 +162,9 @@ EOF
         return 1;
     }
 
-    writeln(getNumScenarios, " scenario (", getNumPassed, " passed)");
+    assert(getNumPassed ^ getNumPending);
+    const suffix = getNumPassed ? text(getNumPassed, " passed)") : text(getNumPending, " pending)");
+    writeln(getNumScenarios, " scenario (", suffix);
 
     return 0;
 }
