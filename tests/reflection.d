@@ -32,7 +32,8 @@ void testFindSteps() {
                [ CucumberStep(&passingStep1, r"^I match a passing step$"),
                  CucumberStep(&passingStep2, r"^I also match a passing step$"),
                  CucumberStep(&passingStep3, r"^What about me. I also pass$"),
-                 CucumberStep(&failingStep, r"I match a failing step$") ]);
+                 CucumberStep(&failingStep, r"I match a failing step$"),
+                 CucumberStep(&pendingStep, r"Gotta match pending")]);
 }
 
 void testFindMatch() {

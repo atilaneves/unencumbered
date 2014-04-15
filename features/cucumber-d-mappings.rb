@@ -28,7 +28,7 @@ module CucumberDMappings
   end
 
   def write_pending_mapping(step_name)
-    pending
+    write_step_code(step_name, "pending();");
   end
 
   def assert_pending_scenario
