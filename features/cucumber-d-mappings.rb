@@ -10,15 +10,7 @@ module CucumberDMappings
   end
 
   def write_passing_mapping(step_name)
-    @num_steps ||= 0
-    @num_steps += 1
-    add_src <<-EOF
-
-@Match!(r\"#{step_name}\")
-void testFunc_#{@num_steps}() {
-}
-
-EOF
+    write_step_code(step_name, "") # no code necessary to pass
   end
 
   def assert_passing_scenario
@@ -27,16 +19,7 @@ EOF
   end
 
   def write_failing_mapping(step_name)
-    @num_steps ||= 0
-    @num_steps += 1
-    add_src <<-EOF
-
-@Match!(r\"#{step_name}\")
-void testFunc_#{@num_steps}() {
-    throw new Exception("Failing step");
-}
-
-EOF
+    write_step_code(step_name, 'throw new Exception("Fail");')
   end
 
   def assert_failing_scenario
@@ -162,6 +145,19 @@ import std.conv;
 import std.traits;
 EOF
     @code += code
+  end
+
+  def write_step_code(step_name, code)
+    @num_steps ||= 0
+    @num_steps += 1
+        add_src <<-EOF
+
+@Match!(r\"#{step_name}\")
+void testFunc_#{@num_steps}() {
+    #{code}
+}
+
+EOF
   end
 
   def write_src
