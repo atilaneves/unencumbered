@@ -22,9 +22,7 @@ EOF
   end
 
   def write_failing_mapping(step_name)
-    add_src <<-EOF
-        throw new Exception("Failing mapping for " ~ "#{step_name}");
-EOF
+    pending
   end
 
   def assert_failing_scenario
@@ -33,9 +31,7 @@ EOF
   end
 
   def write_pending_mapping(step_name)
-    add_src <<-EOF
-        Match!(r\"#{step_name}\")(Yes.Pending);
-EOF
+    pending
   end
 
   def assert_pending_scenario
