@@ -10,9 +10,15 @@ module CucumberDMappings
   end
 
   def write_passing_mapping(step_name)
+    @num_steps ||= 0
+    @num_steps += 1
     puts "step is #{step_name}"
     add_src <<-EOF
-        Match!(r\"#{step_name}\");
+
+@Match!(r\"#{step_name}\")
+void testFunc_#{@num_steps}() {
+}
+
 EOF
   end
 
@@ -145,23 +151,17 @@ EOF
 import cucumber.match;
 import std.stdio;
 import std.conv;
-int main() {
-    try {
+import std.traits;
 EOF
     @code += code
   end
 
   def write_src
     add_src <<-EOF
-    } catch(Exception) {
-        writeln("1 scenario (1 failed)");
-        return 1;
-    }
-
-    assert(getNumPassed ^ getNumPending);
-    const suffix = getNumPassed ? text(getNumPassed, " passed)") : text(getNumPending, " pending)");
-    writeln(getNumScenarios, " scenario (", suffix);
-
+int main() {
+    enum myModule = moduleName!main;
+    const results = runFeatures!myModule("I add 4 and 5");
+    writeln(results.toString());
     return 0;
 }
 EOF

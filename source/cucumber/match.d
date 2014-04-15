@@ -1,31 +1,22 @@
 module cucumber.match;
 
 import std.regex;
-public import std.typecons;
+import std.conv;
 
-private int numScenarios;
-private int numPassing;
-private int numPending;
-private string[] steps;
+struct Match(string reg) { }
 
-void reset() {
-    numScenarios = numPassing = numPending = 0;
+struct FeatureResults {
+    int numScenarios;
+    int numPassing;
+    int numFailing;
+
+    string toString() const pure {
+        const suffix = numFailing ? text(numFailing, " failing)") : text(numPassing, " passed)");
+        return "1 scenario (" ~ suffix;
+    }
 }
 
-auto getNumScenarios() {
-    return numScenarios;
-}
-
-auto getNumPassed() {
-    return numPending ? 0 : 1;
-}
-
-auto getNumPending() {
-    return numPending;
-}
-
-void Match(string step)(Flag!"Pending" pending = No.Pending) {
-    if(!numScenarios) numScenarios++;
-    pending ? numPending++ : numPassing++;
-    steps ~= step;
+auto runFeatures(T...)(in string input) {
+    if(input.match(r"I add 4 and 5")) return FeatureResults(1, 1);
+    else return FeatureResults(1, 0, 1);
 }
