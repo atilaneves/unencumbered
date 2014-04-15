@@ -6,13 +6,12 @@ module CucumberDMappings
   def run_feature
     write_src
     source_path = get_absolute_path("../source")
-    run("rdmd -I#{source_path} /tmp/foo 2>&1")
+    run("rdmd --force -I#{source_path} /tmp/foo 2>&1")
   end
 
   def write_passing_mapping(step_name)
     @num_steps ||= 0
     @num_steps += 1
-    puts "step is #{step_name}"
     add_src <<-EOF
 
 @Match!(r\"#{step_name}\")
@@ -28,7 +27,16 @@ EOF
   end
 
   def write_failing_mapping(step_name)
-    pending
+    @num_steps ||= 0
+    @num_steps += 1
+    add_src <<-EOF
+
+@Match!(r\"#{step_name}\")
+void testFunc_#{@num_steps}() {
+    throw new Exception("Failing step");
+}
+
+EOF
   end
 
   def assert_failing_scenario
@@ -159,10 +167,9 @@ EOF
   def write_src
     add_src <<-EOF
 int main() {
-    enum myModule = moduleName!main;
-    const results = runFeatures!myModule("I add 4 and 5");
+    const results = runFeatures!__MODULE__(["I add 4 and 5"]);
     writeln(results.toString());
-    return 0;
+    return results.numFailing ? 1 : 0;
 }
 EOF
     write_file('/tmp/foo.d', @code)
