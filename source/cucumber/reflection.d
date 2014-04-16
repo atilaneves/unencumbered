@@ -71,7 +71,7 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
 
                 static if(isFunction && hasMatch) {
                     enum reg = getRegex!(mixin(member));
-                    mixin(`steps ~= CucumberStep(&` ~ member ~ `, regex(r"` ~ reg ~ `"));`);
+                    mixin(`steps ~= CucumberStep(&` ~ member ~ `, r"` ~ reg ~ `");`);
                     //e.g. steps ~= CucumberStep(&myfunc, r"foobar");
                 }
             }
@@ -95,4 +95,30 @@ void function() findMatch(ModuleNames...)(in string step_str) {
         }
     }
     return null;
+}
+
+/**
+ * Counts the number of parentheses pairs in a string known
+ * at compile-time
+ */
+int countParenPairs(string reg)() {
+    int intCount(in string haystack, in string needle) {
+        import std.algorithm: count;
+        return cast(int)haystack.count(needle);
+    }
+
+    return (intCount(reg, "(") + intCount(reg, ")") -
+            intCount(reg, r"\(") - intCount(reg, r"\)")) / 2;
+}
+
+unittest {
+    static assert(countParenPairs!r"" == 0);
+    static assert(countParenPairs!r"foo" == 0);
+    static assert(countParenPairs!r"(" == 0);
+    static assert(countParenPairs!r"\(\)" == 0);
+    static assert(countParenPairs!r"()" == 1);
+    static assert(countParenPairs!r"()\(\)" == 1);
+    static assert(countParenPairs!r"\(\)()" == 1);
+    static assert(countParenPairs!r"()\(\)()" == 2);
+    static assert(countParenPairs!r"(foo).+\(oh noes\).+(bar)" == 2);
 }
