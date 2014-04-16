@@ -33,7 +33,7 @@ struct CucumberStep {
 }
 
 auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleNames)))) {
-    mixin("import " ~ modulesString!ModuleNames ~ ";");
+    mixin(importModulesString!ModuleNames);
     CucumberStep steps[];
     foreach(mod; ModuleNames) {
         foreach(member; __traits(allMembers, mixin(mod))) {

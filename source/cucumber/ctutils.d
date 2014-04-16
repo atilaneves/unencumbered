@@ -9,6 +9,10 @@ string modulesString(Modules...)() {
     return modules.join(",");
 }
 
+string importModulesString(Modules...)() {
+    return "import " ~ modulesString!Modules ~ ";";
+}
+
 private template HasAttribute(alias mod, string T, alias A) {
     mixin("import " ~ fullyQualifiedName!mod ~ ";"); //so it's visible
     enum index = staticIndexOf!(A, __traits(getAttributes, mixin(T)));
