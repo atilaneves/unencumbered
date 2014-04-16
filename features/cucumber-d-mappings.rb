@@ -46,11 +46,25 @@ module CucumberDMappings
   end
 
   def write_calculator_code
-    pending "Not implemented yet"
+
   end
 
   def write_mappings_for_calculator
-    pending
+    add_src <<-EOF
+
+@Given!(r"^a calculator$")
+void giveCalc() {
+}
+
+@When!(r"^the calculator computes PI$")
+void whenCalc() {
+}
+
+@Then!(r"^the calculator returns PI$")
+void thenCalc() {
+}
+
+EOF
   end
 
   def write_custom_world_constructor
@@ -145,7 +159,7 @@ EOF
   def write_step_code(step_name, code)
     @num_steps ||= 0
     @num_steps += 1
-        add_src <<-EOF
+    add_src <<-EOF
 
 @Match!(r\"#{step_name}\")
 void testFunc_#{@num_steps}() {
@@ -158,13 +172,13 @@ EOF
   def write_src
     add_src <<-EOF
 int main() {
-    const results = runFeatures!__MODULE__(["I add 4 and 5"]);
+    const results = runFeature!__MODULE__(#{read_steps});
     writeln(results.toString());
     return results.numFailing ? 1 : 0;
 }
 EOF
     write_file('/tmp/foo.d', @code)
-    puts "code is \n#{@code}\n"
+    puts "/tmp/foo.d:\n#{@code}\n"
   end
 
   def compile()
@@ -175,6 +189,11 @@ EOF
 
   def get_absolute_path(relative_path)
     File.expand_path(relative_path, File.dirname(__FILE__))
+  end
+
+  def read_steps()
+    lines = File.readlines("tmp/aruba/features/a_feature.feature")
+    lines.map { |l| l.chomp }.select { |l| !l.empty? }
   end
 
 end

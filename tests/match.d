@@ -2,11 +2,8 @@ module tests.match;
 
 import unit_threaded;
 import cucumber.match;
-import std.traits;
 
 private string[] funcCalls;
-
-public:
 
 @Match!(r"^I match a passing step$")
 void passingStep1() {
@@ -37,7 +34,8 @@ private {
 
 void testMatchPassing12() {
     funcCalls = [];
-    const results = runFeatures!__MODULE__(["I match a passing step", "I also match a passing step"]);
+    const results = runFeature!__MODULE__(["Feature: A feature", "  Scenario: A Scenario:",
+                                           "I match a passing step", "I also match a passing step"]);
     checkEqual(results.numScenarios, 1);
     checkEqual(results.numPassing, 1);
     checkEqual(results.numFailing, 0);
@@ -49,7 +47,7 @@ void testMatchPassing12() {
 
 void testMatchPassing3() {
     funcCalls = [];
-    const results = runFeatures!__MODULE__(["What about me? I also pass"]);
+    const results = runFeature!__MODULE__(["What about me? I also pass"]);
     checkEqual(results.numScenarios, 1);
     checkEqual(results.numPassing, 1);
     checkEqual(results.numFailing, 0);
@@ -61,7 +59,7 @@ void testMatchPassing3() {
 
 void testMatchNotPassing() {
     funcCalls = [];
-    const results = runFeatures!__MODULE__(["I match a failing step"]);
+    const results = runFeature!__MODULE__(["I match a failing step"]);
     checkEqual(results.numScenarios, 1);
     checkEqual(results.numPassing, 0);
     checkEqual(results.numFailing, 1);
@@ -72,9 +70,9 @@ void testMatchNotPassing() {
 }
 
 
-void testUndefined() {
+void testUndefinedWithWrongString() {
     funcCalls = [];
-    const results = runFeatures!__MODULE__(["totally invented string"]);
+    const results = runFeature!__MODULE__(["totally invented string"]);
     checkEqual(results.numScenarios, 1);
     checkEqual(results.numPassing, 0);
     checkEqual(results.numFailing, 0);
@@ -84,6 +82,7 @@ void testUndefined() {
     checkEqual(funcCalls, []);
 }
 
+
 @Match!(r"Gotta match pending")
 void pendingStep() {
     pending();
@@ -91,7 +90,7 @@ void pendingStep() {
 
 void testPending() {
     funcCalls = [];
-    const results = runFeatures!__MODULE__(["Gotta match pending"]);
+    const results = runFeature!__MODULE__(["Gotta match pending"]);
     checkEqual(results.numScenarios, 1);
     checkEqual(results.numPassing, 0);
     checkEqual(results.numFailing, 0);
