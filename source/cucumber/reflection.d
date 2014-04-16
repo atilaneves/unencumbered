@@ -34,18 +34,20 @@ unittest {
     }
 }
 
+alias CucumberStepFunction = void function(in string[] = []);
+
 struct CucumberStep {
-    this(void function() func, Regex!char regex) {
+    this(CucumberStepFunction func, Regex!char reg) {
         this.func = func;
-        this.regex = regex;
+        this.regex = reg;
     }
 
-    this(void function() func, in string reg) {
+    this(CucumberStepFunction func, in string reg) {
         this.func = func;
         this.regex = std.regex.regex(reg);
     }
 
-    void function() func;
+    CucumberStepFunction func;
     Regex!char regex;
 }
 
@@ -72,7 +74,7 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
                 static if(isFunction && hasMatch) {
                     enum reg = getRegex!(mixin(member));
                     //e.g. lambda = () { myfunc(); }
-                    enum lambda = "() { " ~ member ~ "(); }";
+                    enum lambda = "(in string[]) { " ~ member ~ "(); }";
                     //e.g. steps ~= CucumberStep(() { myfunc(); }, r"foobar");
                     mixin(`steps ~= CucumberStep(` ~ lambda ~ `, r"` ~ reg ~ `");`);
                 }
@@ -89,10 +91,11 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
  * over to see which one has a matching regex. Steps are found
  * at compile-time.
  */
-void function() findMatch(ModuleNames...)(in string step_str) {
+CucumberStepFunction findMatch(ModuleNames...)(in string step_str) {
     enum steps = findSteps!ModuleNames;
     foreach(step; steps) {
-        if(step_str.match(step.regex)) {
+        auto m = step_str.match(step.regex);
+        if(m) {
             return step.func;
         }
     }
@@ -123,4 +126,20 @@ unittest {
     static assert(countParenPairs!r"\(\)()" == 1);
     static assert(countParenPairs!r"()\(\)()" == 2);
     static assert(countParenPairs!r"(foo).+\(oh noes\).+(bar)" == 2);
+}
+
+
+string callArgsString(int N, Args...)() {
+    string[] args;
+    foreach(arg; Args) {
+        args ~= arg;
+    }
+    import std.array;
+    return args.join(", ");
+}
+
+unittest {
+    static assert(callArgsString!0 == "");
+    static assert(callArgsString!(1, "arg1") == "arg1");
+    static assert(callArgsString!(1, "arg1", "arg2") == "arg1, arg2");
 }

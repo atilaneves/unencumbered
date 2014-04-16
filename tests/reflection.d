@@ -77,12 +77,17 @@ void testFindMatchSteps() {
     checkEqual(matchFuncCalls, ["passingStep1", "passingStep2", "passingStep3", "failingStep"]);
 }
 
-@HiddenTest
 void testFindMatch() {
-    checkEqual(findMatch!__MODULE__("I match step1"), &step1);
-    checkEqual(findMatch!__MODULE__("I think I match step2......"), &step2); //extra chars, still matches
-    checkEqual(findMatch!__MODULE__("Ooh, step3"), &step3);
-    void function() nullfunc;
-    checkEqual(findMatch!__MODULE__("Ooh, step3."), nullfunc);
-    checkEqual(findMatch!__MODULE__("random garbage"), nullfunc);
+    reflectionFuncCalls = [];
+
+    findMatch!__MODULE__("I match step1")();
+    checkEqual(reflectionFuncCalls, ["step1"]);
+
+    findMatch!__MODULE__("I think I match step2......")(); //extra chars, still matches
+    checkEqual(reflectionFuncCalls, ["step1", "step2"]);
+    findMatch!__MODULE__("Ooh, step3")();
+    checkEqual(reflectionFuncCalls, ["step1", "step2", "step3"]);
+
+    checkNull(findMatch!__MODULE__("Ooh, step3."));
+    checkNull(findMatch!__MODULE__("random garbage"));
 }
