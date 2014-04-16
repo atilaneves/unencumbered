@@ -6,22 +6,22 @@ import cucumber.match;
 package string[] matchFuncCalls;
 
 @Match!(r"^I match a passing step$")
-void passingStep1() {
+void passingStep1(in string[]) {
     matchFuncCalls ~= "passingStep1";
 }
 
 @Match!(r"^I also match a passing step$")
-void passingStep2() {
+void passingStep2(in string[]) {
     matchFuncCalls ~= "passingStep2";
 }
 
 @Match!(r"^What about me. I also pass$")
-void passingStep3() {
+void passingStep3(in string[]) {
     matchFuncCalls ~= "passingStep3";
 }
 
 @Match!(r"I match a failing step$")
-void failingStep() {
+void failingStep(in string[]) {
     matchFuncCalls ~= "failingStep";
     throw new Exception("Exception: step failed");
 }
@@ -84,7 +84,7 @@ void testUndefinedWithWrongString() {
 
 
 @Match!(r"Gotta match pending")
-void pendingStep() {
+void pendingStep(in string[]) {
     pending();
 }
 

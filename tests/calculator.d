@@ -8,17 +8,17 @@ private string[] funcCalls;
 
 
 @Given!(r"^a calculator$")
-void giveCalc() {
+void giveCalc(in string[]) {
     funcCalls ~= "given";
 }
 
 @When!(r"^the calculator computes PI$")
-void whenCalc() {
+void whenCalc(in string[]) {
     funcCalls ~= "when";
 }
 
 @Then!(r"^the calculator returns PI$")
-void thenCalc() {
+void thenCalc(in string[]) {
     funcCalls ~="then";
 }
 

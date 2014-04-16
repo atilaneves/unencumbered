@@ -10,17 +10,17 @@ import std.array;
 private string[] reflectionFuncCalls;
 
 @Match!(r"^I match step1")
-void step1() {
+void step1(in string[]) {
     reflectionFuncCalls ~= "step1";
 }
 
 @Match!(r"^I think I match step2")
-void step2() {
+void step2(in string[]) {
     reflectionFuncCalls ~= "step2";
 }
 
 @Match!(r"^Ooh, step3$")
-void step3() {
+void step3(in string[]) {
     reflectionFuncCalls ~= "step3";
 }
 

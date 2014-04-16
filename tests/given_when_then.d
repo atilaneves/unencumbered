@@ -7,22 +7,22 @@ import cucumber.match;
 private string[] funcCalls;
 
 @Given!(r"^A situation$")
-void given() {
+void given(in string[]) {
     funcCalls ~= "Given";
 }
 
 @When!(r"^I do this")
-void when() {
+void when(in string[]) {
     funcCalls ~= "When";
 }
 
 @Then!(r"^This happens")
-void then() {
+void then(in string[]) {
     funcCalls ~= "Then";
 }
 
 @When!(r"I do a failing step$")
-void failingStep() {
+void failingStep(in string[]) {
     funcCalls ~= "failingStep";
     throw new Exception("Exception: step failed");
 }
