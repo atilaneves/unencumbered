@@ -130,6 +130,29 @@ unittest {
     static assert(countParenPairs!r"(foo).+\(oh noes\).+(bar)" == 2);
 }
 
+/**
+ * Comma separated argument list for calls to variadic functions
+ * associated with regexen. Meant to be used with mixin to
+ * generate code.
+ */
+string argsString(string reg)() {
+    string[] args;
+    import std.conv;
+    foreach(i; 0 .. countParenPairs!reg) {
+        args ~= "captures[" ~ i.to!string ~ "]";
+    }
+    import std.array;
+    return args.join(", ");
+}
+
+string argsStringWithParens(string reg)() {
+    return "(" ~ argsString!reg ~ ")";
+}
+
+unittest {
+    static assert(argsString!r"" == "");
+    static assert(argsString!r"(foo)...(bar)" == "captures[0], captures[1]");
+}
 
 /**
  * This function is necessary due to the extreme "metaness" of
