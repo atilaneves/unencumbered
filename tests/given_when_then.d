@@ -1,8 +1,8 @@
 module tests.given_when_then;
 
 import unit_threaded;
-import cucumber.match;
-
+import cucumber.keywords;
+import cucumber.feature;
 
 private string[] funcCalls;
 

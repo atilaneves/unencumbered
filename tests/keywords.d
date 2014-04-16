@@ -1,7 +1,7 @@
 module tests.keywords;
 
 import unit_threaded;
-import cucumber.match;
+import cucumber.keywords;
 
 void testStripKeywords() {
     checkEqual("Given foo".stripCucumberKeywords, "foo");

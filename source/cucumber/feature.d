@@ -1,4 +1,4 @@
-module cucumber.match;
+module cucumber.feature;
 
 import cucumber.ctutils;
 import cucumber.reflection;
@@ -7,13 +7,6 @@ import std.regex;
 import std.conv;
 import std.algorithm;
 import std.traits;
-
-struct Match(string reg) { }
-alias Given = Match;
-alias When = Match;
-alias Then = Match;
-alias And = Match;
-alias But = Match;
 
 struct FeatureResults {
     int numScenarios;
@@ -37,22 +30,6 @@ class PendingException: Exception {
     this(string msg) { super(msg); }
 }
 
-string stripCucumberKeywords(string str) {
-    string stripImpl(string str, in string keyword) {
-        str = std.string.stripLeft(str);
-        if(str.startsWith(keyword)) {
-            return std.array.replace(str, keyword, "");
-        } else {
-            return str;
-        }
-    }
-
-    foreach(keyword; ["Given", "When", "Then", "And", "But"]) {
-        str = stripImpl(str, keyword);
-    }
-
-    return std.string.stripLeft(str);
-}
 
 auto runFeature(Modules...)(string[] input) {
     foreach(line; input.map!(l => std.string.stripLeft(l))) {

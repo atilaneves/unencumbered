@@ -1,7 +1,8 @@
 module tests.match;
 
 import unit_threaded;
-import cucumber.match;
+import cucumber.keywords;
+import cucumber.feature;
 
 package string[] matchFuncCalls;
 

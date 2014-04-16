@@ -1,7 +1,7 @@
 module tests.reflection;
 
 import unit_threaded;
-import cucumber.match;
+import cucumber.keywords;
 import cucumber.reflection;
 import std.regex;
 import std.algorithm;

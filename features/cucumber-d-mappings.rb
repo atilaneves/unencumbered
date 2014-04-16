@@ -179,8 +179,9 @@ EOF
     pending "Not implemented yet"
   end
 
-  def assert_scenario_reported_as_failing(step_name)
-    pending "Not implemented yet"
+  def assert_scenario_reported_as_failing(scenario_name)
+    assert_partial_output("!!! Scenario: #{scenario_name} failed", all_output)
+    assert_success false
   end
 
   def assert_scenario_not_reported_as_failing(step_name)
@@ -203,7 +204,7 @@ EOF
 
   def add_src(code)
     @code ||= <<-EOF
-import cucumber.match;
+import cucumber;
 import unit_threaded;
 import std.stdio;
 import std.conv;

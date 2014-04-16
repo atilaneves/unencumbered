@@ -1,6 +1,7 @@
 module tests.calculator;
 
-import cucumber.match;
+import cucumber.keywords;
+import cucumber.feature;
 import unit_threaded;
 import std.conv;
 import std.math;
