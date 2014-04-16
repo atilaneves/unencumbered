@@ -37,7 +37,6 @@ module CucumberDMappings
   end
 
   def assert_undefined_scenario
-    pending
     assert_partial_output("1 scenario (1 undefined)", all_output)
     assert_success true
   end

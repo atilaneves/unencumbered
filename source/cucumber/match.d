@@ -15,11 +15,14 @@ struct FeatureResults {
     int numPassing;
     int numFailing;
     int numPending;
+    int numUndefined;
 
     string toString() const pure {
-        assert(numPassing ^ numFailing ^ numPending);
+        assert(numPassing ^ numFailing ^ numPending ^ numUndefined,
+               text(numPassing, numFailing, numPending, numUndefined));
         const suffix = numFailing ? text(numFailing, " failed)") :
                        numPending ? text(numPending, " pending)") :
+                       numUndefined ? text(numUndefined, " undefined)") :
                        text(numPassing, " passed)");
         return "1 scenario (" ~ suffix;
     }
@@ -32,7 +35,7 @@ class PendingException: Exception {
 auto runFeatures(Modules...)(in string[] input) {
     foreach(line; input) {
         auto func = findMatch!Modules(line);
-        if(func is null) return FeatureResults(1, 0, 1, 0);
+        if(func is null) return FeatureResults(1, 0, 0, 0, 1);
         try {
             func();
         } catch(PendingException) {

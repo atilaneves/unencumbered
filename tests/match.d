@@ -40,8 +40,9 @@ void testMatchPassing12() {
     const results = runFeatures!__MODULE__(["I match a passing step", "I also match a passing step"]);
     checkEqual(results.numScenarios, 1);
     checkEqual(results.numPassing, 1);
-    checkEqual(results.numPending, 0);
     checkEqual(results.numFailing, 0);
+    checkEqual(results.numPending, 0);
+    checkEqual(results.numUndefined, 0);
     checkEqual(results.toString(), "1 scenario (1 passed)");
     checkEqual(funcCalls, ["passingStep1", "passingStep2"]);
 }
@@ -53,6 +54,7 @@ void testMatchPassing3() {
     checkEqual(results.numPassing, 1);
     checkEqual(results.numFailing, 0);
     checkEqual(results.numPending, 0);
+    checkEqual(results.numUndefined, 0);
     checkEqual(results.toString(), "1 scenario (1 passed)");
     checkEqual(funcCalls, ["passingStep3"]);
 }
@@ -64,19 +66,21 @@ void testMatchNotPassing() {
     checkEqual(results.numPassing, 0);
     checkEqual(results.numFailing, 1);
     checkEqual(results.numPending, 0);
+    checkEqual(results.numUndefined, 0);
     checkEqual(results.toString(), "1 scenario (1 failed)");
     checkEqual(funcCalls, ["failingStep"]);
 }
 
 
-void testNoMatch() {
+void testUndefined() {
     funcCalls = [];
     const results = runFeatures!__MODULE__(["totally invented string"]);
     checkEqual(results.numScenarios, 1);
     checkEqual(results.numPassing, 0);
-    checkEqual(results.numFailing, 1);
+    checkEqual(results.numFailing, 0);
     checkEqual(results.numPending, 0);
-    checkEqual(results.toString(), "1 scenario (1 failed)");
+    checkEqual(results.numUndefined, 1);
+    checkEqual(results.toString(), "1 scenario (1 undefined)");
     checkEqual(funcCalls, []);
 }
 
