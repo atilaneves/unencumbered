@@ -6,7 +6,7 @@ module CucumberDMappings
   def run_feature
     write_src
     source_path = get_absolute_path("../source")
-    run("rdmd --force -I#{source_path} /tmp/foo 2>&1")
+    run("rdmd --force -I#{source_path} -I~/.dub/packages/unit-threaded-master /tmp/foo 2>&1")
   end
 
   def write_passing_mapping(step_name)
@@ -46,26 +46,53 @@ module CucumberDMappings
   end
 
   def write_calculator_code
+    add_src <<-EOF
 
+struct Calculator {
+    double result;
+
+    void add(double a, double b) {
+        result = a + b;
+    }
+
+    void computePi() {
+        import std.math;
+        result = PI;
+    }
+}
+
+private Calculator calculator;
+
+bool closeEnough(T, U)(T a, U b) {
+    import std.math;
+    return abs(a - b) < 1e-6;
+}
+
+EOF
   end
 
   def write_mappings_for_calculator
     add_src <<-EOF
 
 @Given!(r"^a calculator$")
-void giveCalc() {
+void initCalculator() {
+    calculator = Calculator();
 }
 
 @When!(r"^the calculator computes PI$")
-void whenCalc() {
+void calculatorComputesPi() {
+    calculator.computePi();
 }
 
 @Then!(r"^the calculator returns PI$")
-void thenCalc() {
+void calculatorReturns() {
+    import std.math;
+    checkTrue(closeEnough(calculator.result, PI));
 }
 
 @When!(r"^the calculator adds up (.+) and (.+)$")
 void whenAddsUp() {
+    calculator.add(3, 0.14);
 }
 
 @And!(r"^the calculator adds up (.+) and (.+)$")
@@ -161,6 +188,7 @@ EOF
   def add_src(code)
     @code ||= <<-EOF
 import cucumber.match;
+import unit_threaded;
 import std.stdio;
 import std.conv;
 import std.traits;
