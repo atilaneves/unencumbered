@@ -22,6 +22,10 @@ module CucumberDMappings
     write_step_code(step_name, 'throw new Exception("Fail");')
   end
 
+  def write_failing_mapping_with_message(step_name, message)
+    write_step_code(step_name, "throw new Exception(\"#{message}\");")
+  end
+
   def assert_failing_scenario
     assert_partial_output("1 scenario (1 failed)", all_output)
     assert_success false
@@ -172,10 +176,6 @@ EOF
   end
 
   def assert_data_table_equals_json(step_name)
-    pending "Not implemented yet"
-  end
-
-  def write_failing_mapping_with_message(step_name, message)
     pending "Not implemented yet"
   end
 

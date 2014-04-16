@@ -71,7 +71,9 @@ auto runFeature(Modules...)(string[] input) {
             func();
         } catch(PendingException) {
             return FeatureResults(1, 0, 0, 1);
-        } catch(Exception) {
+        } catch(Exception e) {
+            import std.stdio;
+            writeln("Exception: ", e.msg);
             return FeatureResults(1, 0, 1, 0);
         }
     }
