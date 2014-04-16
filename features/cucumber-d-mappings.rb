@@ -75,32 +75,32 @@ EOF
     add_src <<-EOF
 
 @Given!(r"^a calculator$")
-void initCalculator() {
+void initCalculator(in string[]) {
     calculator = Calculator();
 }
 
 @When!(r"^the calculator computes PI$")
-void calculatorComputesPi() {
+void calculatorComputesPi(in string[]) {
     calculator.computePi();
 }
 
 @Then!(r"^the calculator returns PI$")
-void calculatorReturns() {
+void calculatorReturns(in string[]) {
     import std.math;
     checkTrue(closeEnough(calculator.result, PI));
 }
 
 @When!(r"^the calculator adds up (.+) and (.+)$")
-void whenAddsUp() {
+void whenAddsUp(in string[]) {
     calculator.add(3, 0.14);
 }
 
 @And!(r"^the calculator adds up (.+) and (.+)$")
-void andAddsUp() {
+void andAddsUp(in string[]) {
 }
 
 @But!(r"^the calculator does not return 3$")
-void butDoesNot() {
+void butDoesNot(in string[]) {
 }
 
 EOF
@@ -202,7 +202,7 @@ EOF
     add_src <<-EOF
 
 @Match!(r\"#{step_name}\")
-void testFunc_#{@num_steps}() {
+void testFunc_#{@num_steps}(in string[]) {
     #{code}
 }
 
