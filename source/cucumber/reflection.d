@@ -4,6 +4,7 @@ import cucumber.ctutils;
 import cucumber.match;
 import std.traits;
 import std.typetuple;
+import std.regex;
 
 
 private enum isMatchStruct(T) = is(T:Match!S, string S);
@@ -34,8 +35,18 @@ unittest {
 }
 
 struct CucumberStep {
+    this(void function() func, Regex!char regex) {
+        this.func = func;
+        this.regex = regex;
+    }
+
+    this(void function() func, in string reg) {
+        this.func = func;
+        this.regex = std.regex.regex(reg);
+    }
+
     void function() func;
-    string regex;
+    Regex!char regex;
 }
 
 
@@ -60,7 +71,7 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
 
                 static if(isFunction && hasMatch) {
                     enum reg = getRegex!(mixin(member));
-                    mixin(`steps ~= CucumberStep(&` ~ member ~ `, r"` ~ reg ~ `");`);
+                    mixin(`steps ~= CucumberStep(&` ~ member ~ `, regex(r"` ~ reg ~ `"));`);
                     //e.g. steps ~= CucumberStep(&myfunc, r"foobar");
                 }
             }
@@ -79,7 +90,6 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
 void function() findMatch(ModuleNames...)(in string step_str) {
     enum steps = findSteps!ModuleNames;
     foreach(step; steps) {
-        import std.regex;
         if(step_str.match(step.regex)) {
             return step.func;
         }

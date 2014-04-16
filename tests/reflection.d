@@ -24,9 +24,9 @@ private {
 
 void testFindSteps() {
     checkEqual(findSteps!(__MODULE__),
-               [ CucumberStep(&step1, "^I match step1"),
-                 CucumberStep(&step2, "^I think I match step2"),
-                 CucumberStep(&step3, "^Ooh, step3$") ]);
+               [ CucumberStep(&step1, r"^I match step1"),
+                 CucumberStep(&step2, r"^I think I match step2"),
+                 CucumberStep(&step3, r"^Ooh, step3$") ]);
     import tests.match;
     checkEqual(findSteps!("tests.match"),
                [ CucumberStep(&passingStep1, r"^I match a passing step$"),
