@@ -91,8 +91,8 @@ void calculatorReturns(in string[]) {
 }
 
 @When!(r"^the calculator adds up (.+) and (.+)$")
-void whenAddsUp(in string[]) {
-    calculator.add(3, 0.14);
+void whenAddsUp(in string[] captures) {
+    calculator.add(captures[1].to!double, captures[2].to!double);
 }
 
 @And!(r"^the calculator adds up (.+) and (.+)$")
