@@ -42,11 +42,7 @@ module CucumberDMappings
   end
 
   def failed_output
-    pending "Not implemented yet"
-  end
-
-  def assert_no_partial_output(msg, all_output)
-    pending "Not implemented yet"
+    "failed"
   end
 
   def write_calculator_code
