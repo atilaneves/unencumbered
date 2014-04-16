@@ -102,6 +102,12 @@ void andAddsUp(in string[] captures) {
     calculator.add(captures[1].to!double, captures[2].to!double);
 }
 
+@When!(`the calculator adds up "([0-9.]+)", "([0-9.]+)" and "([0-9.]+)"`)
+void whenAdds3(in string[] captures) {
+    writeln("and adds up ", captures[1], ", ", captures[2], " to ", captures[3]);
+    calculator.add(captures[1].to!double, captures[2].to!double, captures[3].to!double);
+}
+
 @But!(r"^the calculator does not return 3$")
 void butDoesNot(in string[]) {
     checkFalse(closeEnough(calculator.result, 3));
