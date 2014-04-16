@@ -3,26 +3,26 @@ module tests.match;
 import unit_threaded;
 import cucumber.match;
 
-private string[] funcCalls;
+package string[] matchFuncCalls;
 
 @Match!(r"^I match a passing step$")
 void passingStep1() {
-    funcCalls ~= "passingStep1";
+    matchFuncCalls ~= "passingStep1";
 }
 
 @Match!(r"^I also match a passing step$")
 void passingStep2() {
-    funcCalls ~= "passingStep2";
+    matchFuncCalls ~= "passingStep2";
 }
 
 @Match!(r"^What about me. I also pass$")
 void passingStep3() {
-    funcCalls ~= "passingStep3";
+    matchFuncCalls ~= "passingStep3";
 }
 
 @Match!(r"I match a failing step$")
 void failingStep() {
-    funcCalls ~= "failingStep";
+    matchFuncCalls ~= "failingStep";
     throw new Exception("Exception: step failed");
 }
 
@@ -33,7 +33,7 @@ private {
 
 
 void testMatchPassing12() {
-    funcCalls = [];
+    matchFuncCalls = [];
     const results = runFeature!__MODULE__(["Feature: A feature", "  Scenario: A Scenario:",
                                            "I match a passing step", "I also match a passing step"]);
     checkEqual(results.numScenarios, 1);
@@ -42,11 +42,11 @@ void testMatchPassing12() {
     checkEqual(results.numPending, 0);
     checkEqual(results.numUndefined, 0);
     checkEqual(results.toString(), "1 scenario (1 passed)");
-    checkEqual(funcCalls, ["passingStep1", "passingStep2"]);
+    checkEqual(matchFuncCalls, ["passingStep1", "passingStep2"]);
 }
 
 void testMatchPassing3() {
-    funcCalls = [];
+    matchFuncCalls = [];
     const results = runFeature!__MODULE__(["What about me? I also pass"]);
     checkEqual(results.numScenarios, 1);
     checkEqual(results.numPassing, 1);
@@ -54,11 +54,11 @@ void testMatchPassing3() {
     checkEqual(results.numPending, 0);
     checkEqual(results.numUndefined, 0);
     checkEqual(results.toString(), "1 scenario (1 passed)");
-    checkEqual(funcCalls, ["passingStep3"]);
+    checkEqual(matchFuncCalls, ["passingStep3"]);
 }
 
 void testMatchNotPassing() {
-    funcCalls = [];
+    matchFuncCalls = [];
     const results = runFeature!__MODULE__(["I match a failing step"]);
     checkEqual(results.numScenarios, 1);
     checkEqual(results.numPassing, 0);
@@ -66,12 +66,12 @@ void testMatchNotPassing() {
     checkEqual(results.numPending, 0);
     checkEqual(results.numUndefined, 0);
     checkEqual(results.toString(), "1 scenario (1 failed)");
-    checkEqual(funcCalls, ["failingStep"]);
+    checkEqual(matchFuncCalls, ["failingStep"]);
 }
 
 
 void testUndefinedWithWrongString() {
-    funcCalls = [];
+    matchFuncCalls = [];
     const results = runFeature!__MODULE__(["totally invented string"]);
     checkEqual(results.numScenarios, 1);
     checkEqual(results.numPassing, 0);
@@ -79,7 +79,7 @@ void testUndefinedWithWrongString() {
     checkEqual(results.numPending, 0);
     checkEqual(results.numUndefined, 1);
     checkEqual(results.toString(), "1 scenario (1 undefined)");
-    checkEqual(funcCalls, []);
+    checkEqual(matchFuncCalls, []);
 }
 
 
@@ -89,12 +89,12 @@ void pendingStep() {
 }
 
 void testPending() {
-    funcCalls = [];
+    matchFuncCalls = [];
     const results = runFeature!__MODULE__(["Gotta match pending"]);
     checkEqual(results.numScenarios, 1);
     checkEqual(results.numPassing, 0);
     checkEqual(results.numFailing, 0);
     checkEqual(results.numPending, 1);
     checkEqual(results.toString(), "1 scenario (1 pending)");
-    checkEqual(funcCalls, []);
+    checkEqual(matchFuncCalls, []);
 }
