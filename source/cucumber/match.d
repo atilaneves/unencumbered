@@ -12,6 +12,8 @@ struct Match(string reg) { }
 alias Given = Match;
 alias When = Match;
 alias Then = Match;
+alias And = Match;
+alias But = Match;
 
 struct FeatureResults {
     int numScenarios;
@@ -44,7 +46,7 @@ string stripCucumberKeywords(string str) pure {
         }
     }
 
-    foreach(keyword; ["Given", "When", "Then"]) {
+    foreach(keyword; ["Given", "When", "Then", "And", "But"]) {
         str = stripImpl(str, keyword);
     }
 

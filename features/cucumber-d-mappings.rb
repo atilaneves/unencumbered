@@ -64,6 +64,18 @@ void whenCalc() {
 void thenCalc() {
 }
 
+@When!(r"^the calculator adds up (.+) and (.+)$")
+void whenAddsUp() {
+}
+
+@And!(r"^the calculator adds up (.+) and (.+)$")
+void andAddsUp() {
+}
+
+@But!(r"^the calculator does not return 3$")
+void butDoesNot() {
+}
+
 EOF
   end
 
