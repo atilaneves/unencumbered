@@ -56,7 +56,6 @@ struct Calculator {
     }
 
     void computePi() {
-        import std.math;
         result = PI;
     }
 }
@@ -64,7 +63,6 @@ struct Calculator {
 private Calculator calculator;
 
 bool closeEnough(T, U)(T a, U b) {
-    import std.math;
     return abs(a - b) < 1e-6;
 }
 
@@ -86,7 +84,6 @@ void calculatorComputesPi(in string[]) {
 
 @Then!(r"^the calculator returns PI$")
 void calculatorReturns(in string[]) {
-    import std.math;
     checkTrue(closeEnough(calculator.result, PI));
 }
 
@@ -101,6 +98,11 @@ void andAddsUp(in string[]) {
 
 @But!(r"^the calculator does not return 3$")
 void butDoesNot(in string[]) {
+}
+
+@Then!(`^the calculator returns "(.+)"`)
+void thenReturnsPi(in string[] captures) {
+    checkTrue(closeEnough(calculator.result, captures[1].to!double));
 }
 
 EOF
@@ -192,6 +194,7 @@ import unit_threaded;
 import std.stdio;
 import std.conv;
 import std.traits;
+import std.math;
 EOF
     @code += code
   end

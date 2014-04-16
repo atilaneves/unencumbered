@@ -72,10 +72,10 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
                 enum hasMatch = hasMatchUDA!(mixin(member));
 
                 static if(isFunction && hasMatch) {
-                    enum reg = getRegex!(mixin(member));
+                    enum reg = rawStringMixin(getRegex!(mixin(member)));
                     enum lambda = "(in string[] captures) { " ~ member ~ "(captures); }";
                     //e.g. steps ~= CucumberStep((in string[] cs) { myfunc(cs); }, r"foobar");
-                    mixin(`steps ~= CucumberStep(` ~ lambda ~ `, r"` ~ reg ~ `");`);
+                    mixin(`steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `);`);
                 }
             }
         }
@@ -129,17 +129,25 @@ unittest {
 }
 
 
-string callArgsString(int N, Args...)() {
-    string[] args;
-    foreach(arg; Args) {
-        args ~= arg;
-    }
+/**
+ * This function is necessary due to the extreme "metaness" of
+ * this project. It returns a string that is meant to be consumed
+ * by mixin to generate code. Since the strings being fed to
+ * the system at compile-time are generally going to be
+ * "raw" strings, they'll either be r"" or `` style D strings.
+ * If the regex requires the '"' character they'll use ``, and
+ * vice-versa. When generating code, I opted for r"" strings.
+ * This would cause a compilation error if the regex has the
+ * quote character in it. So this function returns an escaped
+ * version that can be safely used.
+ */
+string rawStringMixin(in string str) {
     import std.array;
-    return args.join(", ");
+    return "r\"" ~ str.replace(`"`, "\" ~ `\"` ~ r\"") ~ "\"";
 }
 
 unittest {
-    static assert(callArgsString!0 == "");
-    static assert(callArgsString!(1, "arg1") == "arg1");
-    static assert(callArgsString!(1, "arg1", "arg2") == "arg1, arg2");
+    static assert(rawStringMixin(`Sharks with "lasers" yo.`) ==
+                  "r\"Sharks with \" ~ `\"` ~ r\"lasers\" ~ `\"` ~ r\" yo.\"");
+    static assert(rawStringMixin(`foo bar baz`) == "r\"foo bar baz\"");
 }
