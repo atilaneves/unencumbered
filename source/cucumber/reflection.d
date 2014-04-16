@@ -73,9 +73,10 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
 
                 static if(isFunction && hasMatch) {
                     enum reg = rawStringMixin(getRegex!(mixin(member)));
-                    enum lambda = "(in string[] captures) { " ~ member ~ "(captures); }";
+                    enum lambda = "(captures) { " ~ member ~ "(captures); }";
                     //e.g. steps ~= CucumberStep((in string[] cs) { myfunc(cs); }, r"foobar");
-                    mixin(`steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `);`);
+                    enum mixinStr = `steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `);`;
+                    mixin(mixinStr);
                 }
             }
         }
@@ -90,7 +91,8 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
  * over to see which one has a matching regex. Steps are found
  * at compile-time.
  */
-auto findMatch(ModuleNames...)(in string step_str) {
+auto findMatch(ModuleNames...)(string step_str) {
+    step_str = stripCucumberKeywords(step_str);
     enum steps = findSteps!ModuleNames;
     foreach(step; steps) {
         auto m = step_str.match(step.regex);

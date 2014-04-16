@@ -51,8 +51,10 @@ module CucumberDMappings
 struct Calculator {
     double result;
 
-    void add(double a, double b) {
-        result = a + b;
+    void add(T...)(T args) {
+        writeln("Adding args ", args);
+        result = 0;
+        foreach(a; args) result += a;
     }
 
     void computePi() {
@@ -84,24 +86,30 @@ void calculatorComputesPi(in string[]) {
 
 @Then!(r"^the calculator returns PI$")
 void calculatorReturns(in string[]) {
+    writeln("returns pi");
     checkTrue(closeEnough(calculator.result, PI));
 }
 
-@When!(r"^the calculator adds up (.+) and (.+)$")
+@When!(`^the calculator adds up "?([0-9.]+)"? and "?([0-9.]+)"?$`)
 void whenAddsUp(in string[] captures) {
+    writeln("adding ", captures[1], " to ", captures[2]);
     calculator.add(captures[1].to!double, captures[2].to!double);
 }
 
-@And!(r"^the calculator adds up (.+) and (.+)$")
-void andAddsUp(in string[]) {
+@And!(r"^the calculator adds up ([0-9.]+) and ([0-9.]+)$")
+void andAddsUp(in string[] captures) {
+    writeln("and adds up ", captures[1], " to ", captures[2]);
+    calculator.add(captures[1].to!double, captures[2].to!double);
 }
 
 @But!(r"^the calculator does not return 3$")
 void butDoesNot(in string[]) {
+    checkFalse(closeEnough(calculator.result, 3));
 }
 
 @Then!(`^the calculator returns "(.+)"`)
 void thenReturnsPi(in string[] captures) {
+    writeln("returns capture");
     checkTrue(closeEnough(calculator.result, captures[1].to!double));
 }
 

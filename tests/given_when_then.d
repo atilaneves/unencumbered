@@ -52,5 +52,4 @@ void testGivenWhenThen() {
     checkEqual(results.numUndefined, 0);
     checkEqual(results.toString(), "1 scenario (1 passed)");
     checkEqual(funcCalls, ["Given", "When", "Then"]);
-
 }

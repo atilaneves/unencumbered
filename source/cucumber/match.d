@@ -37,10 +37,11 @@ class PendingException: Exception {
     this(string msg) { super(msg); }
 }
 
-string stripCucumberKeywords(string str) pure {
-    string stripImpl(in string str, in string keyword) pure {
+string stripCucumberKeywords(string str) {
+    string stripImpl(string str, in string keyword) {
+        str = std.string.stripLeft(str);
         if(str.startsWith(keyword)) {
-            return std.string.stripLeft(std.array.replace(str, keyword, ""));
+            return std.array.replace(str, keyword, "");
         } else {
             return str;
         }
@@ -50,7 +51,7 @@ string stripCucumberKeywords(string str) pure {
         str = stripImpl(str, keyword);
     }
 
-    return str;
+    return std.string.stripLeft(str);
 }
 
 auto runFeature(Modules...)(string[] input) {
@@ -58,8 +59,6 @@ auto runFeature(Modules...)(string[] input) {
 
         if(line.startsWith("Feature:")) continue;
         if(line.startsWith("Scenario:")) continue;
-
-        line = stripCucumberKeywords(line);
 
         auto func = findMatch!Modules(line);
         if(func is null) {
