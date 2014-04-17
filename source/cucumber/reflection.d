@@ -129,20 +129,21 @@ int countParenPairs(string reg)() {
         return cast(int)haystack.count(needle);
     }
 
-    return (intCount(reg, "(") + intCount(reg, ")") -
-            intCount(reg, r"\(") - intCount(reg, r"\)")) / 2;
+    //no need to count matching closing parens since it won't be a valid
+    //regexp and will throw an exception at runtime anyway
+    return intCount(reg, "(") - intCount(reg, r"\(") - intCount(reg, r"(?:");
 }
 
 unittest {
     static assert(countParenPairs!r"" == 0);
     static assert(countParenPairs!r"foo" == 0);
-    static assert(countParenPairs!r"(" == 0);
     static assert(countParenPairs!r"\(\)" == 0);
     static assert(countParenPairs!r"()" == 1);
     static assert(countParenPairs!r"()\(\)" == 1);
     static assert(countParenPairs!r"\(\)()" == 1);
     static assert(countParenPairs!r"()\(\)()" == 2);
     static assert(countParenPairs!r"(foo).+\(oh noes\).+(bar)" == 2);
+    static assert(countParenPairs!r"(.+).+(?:oh noes).+" == 1);
 }
 
 /**
