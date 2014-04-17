@@ -73,9 +73,16 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
 
                 static if(isFunction && hasMatch) {
                     enum reg = rawStringMixin(getRegex!(mixin(member)));
-                    enum lambda = "(captures) { " ~ member ~ "(captures); }";
-                    //e.g. steps ~= CucumberStep((in string[] cs) { myfunc(cs); }, r"foobar");
+
+                    //e.g. funcCall would be "myfunc(captures[0], captures[1]);"
+                    enum funcCall = member ~ argsStringWithParens!reg ~ ";";
+
+                    //e.g. lambda would be "(captures) { myfunc(captures[0]); }"
+                    enum lambda = "(captures) { " ~ funcCall ~ " }";
+
+                    //e.g. steps ~= CucumberStep((in string[] cs) { myfunc(); }, r"foobar");
                     enum mixinStr = `steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `);`;
+
                     mixin(mixinStr);
                 }
             }
