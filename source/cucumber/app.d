@@ -12,16 +12,10 @@ shared static this() {
 }
 
 void accept(TCPConnection tcpConnection) {
-    auto rtask = runTask({
-        while(tcpConnection.connected) {
-            // auto bytes = new ubyte[tcpConnection.leastSize];
-            // tcpConnection.read(bytes);
-            auto bytes = tcpConnection.readLine(size_t.max, "\n");
-            handle(tcpConnection, (cast(string)bytes).strip());
-        }
-    });
-
-    rtask.join();
+    while(tcpConnection.connected) {
+        auto bytes = tcpConnection.readLine(size_t.max, "\n");
+        handle(tcpConnection, (cast(string)bytes).strip());
+    }
 
     if(tcpConnection.connected) tcpConnection.close();
 }
