@@ -83,7 +83,7 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
                                        numCaptures, ") in ", getRegex!(mixin(member))));
 
                     //e.g. funcCall would be "myfunc(captures[0], captures[1]);"
-                    enum funcCall = member ~ argsStringWithParens!reg ~ ";";
+                    enum funcCall = member ~ argsStringWithParens!(reg, mixin(member)) ~ ";";
 
                     //e.g. lambda would be "(captures) { myfunc(captures[0]); }"
                     enum lambda = "(captures) { " ~ funcCall ~ " }";
@@ -146,27 +146,59 @@ unittest {
 }
 
 /**
+ * Returns an array of string mixins to convert each type
+ * from a string
+ */
+auto conversionsFromString(Types...)() {
+    string[] convs;
+    foreach(T; Types) {
+        static if(isSomeString!T) {
+            convs ~= "";
+        } else {
+            convs ~= ".to!" ~ T.stringof;
+        }
+    }
+    return convs;
+}
+
+unittest {
+    static assert(conversionsFromString!(int, string) == [".to!int", ""]);
+    static assert(conversionsFromString!(string, double) == ["", ".to!double"]);
+}
+
+/**
  * Comma separated argument list for calls to variadic functions
  * associated with regexen. Meant to be used with mixin to
  * generate code.
  */
-string argsString(string reg)() {
+string argsString(string reg, alias func)() {
+    enum convs = conversionsFromString!(ParameterTypeTuple!func);
+    enum numCaptures = countParenPairs!reg;
+    static assert(convs.length == numCaptures,
+                  text("Wrong length for ", convs, ", should be ", numCaptures));
+
     string[] args;
-    import std.conv;
-    foreach(i; 1 .. countParenPairs!reg + 1) {
-        args ~= "captures[" ~ i.to!string ~ "]";
+    foreach(i; 0 .. numCaptures) {
+        args ~= "captures[" ~ (i + 1).to!string ~ "]" ~ convs[i];
     }
+
     import std.array;
     return args.join(", ");
 }
 
-string argsStringWithParens(string reg)() {
-    return "(" ~ argsString!reg ~ ")";
+string argsStringWithParens(string reg, alias func)() {
+    return "(" ~ argsString!(reg, func) ~ ")";
 }
 
 unittest {
-    static assert(argsString!r"" == "");
-    static assert(argsString!r"(foo)...(bar)" == "captures[1], captures[2]");
+    void func() {}
+    static assert(argsString!(r"", func) == "");
+    void func_is(int, string) {}
+    static assert(argsString!(r"(foo)...(bar)", func_is) == "captures[1].to!int, captures[2]");
+    void func_si(string, int) {}
+    static assert(argsString!(r"(foo)...(bar)", func_si) == "captures[1], captures[2].to!int");
+    void func_dd(double, double) {}
+    static assert(argsString!(r"(foo)...(bar)", func_dd) == "captures[1].to!double, captures[2].to!double");
 }
 
 /**
