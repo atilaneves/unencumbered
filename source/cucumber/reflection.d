@@ -5,6 +5,7 @@ import cucumber.keywords;
 import std.traits;
 import std.typetuple;
 import std.regex;
+import std.conv;
 
 
 private enum isMatchStruct(T) = is(T:Match!S, string S);
@@ -73,6 +74,13 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
 
                 static if(isFunction && hasMatch) {
                     enum reg = rawStringMixin(getRegex!(mixin(member)));
+
+                    enum funcArity = arity!(mixin(member));
+                    enum numCaptures = countParenPairs!reg;
+                    static assert(funcArity == numCaptures,
+                                  text("Arity of ", member, " (", funcArity, ")",
+                                       " does not match the number of capturing parens (",
+                                       numCaptures, ") in ", getRegex!(mixin(member))));
 
                     //e.g. funcCall would be "myfunc(captures[0], captures[1]);"
                     enum funcCall = member ~ argsStringWithParens!reg ~ ";";
