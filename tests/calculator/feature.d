@@ -8,9 +8,13 @@ import unit_threaded;
 import std.math;
 
 void testCalculatorSteps() {
-    writelnUt("test steps");
-    checkNotNull(findMatch!"tests.calculator.steps"("    Given a calculator"));
-    findMatch!"tests.calculator.steps"("    When the calculator adds up \"3\", \"4\" and \"5\"")();
+    const givenStep = "    Given a calculator";
+    writelnUt("Checking the step \"", givenStep, "\" is not null");
+    checkNotNull(findMatch!"tests.calculator.steps"(givenStep));
+
+    const whenStep = "    When the calculator adds up \"3\", \"4\" and \"5\"";
+    writelnUt(`Calling the step "`, whenStep, `"`);
+    findMatch!"tests.calculator.steps"(whenStep)();
 }
 
 void testCalculator() {
@@ -24,7 +28,6 @@ void testCalculator() {
 }
 
 void testCalculator2() {
-
     const results = runFeature!"tests.calculator.steps"(["Feature: A feature",
                                            "  Scenario: scenario",
                                            "    Given a calculator",

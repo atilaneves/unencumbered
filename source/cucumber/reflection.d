@@ -153,7 +153,7 @@ unittest {
 string argsString(string reg)() {
     string[] args;
     import std.conv;
-    foreach(i; 0 .. countParenPairs!reg) {
+    foreach(i; 1 .. countParenPairs!reg + 1) {
         args ~= "captures[" ~ i.to!string ~ "]";
     }
     import std.array;
@@ -166,7 +166,7 @@ string argsStringWithParens(string reg)() {
 
 unittest {
     static assert(argsString!r"" == "");
-    static assert(argsString!r"(foo)...(bar)" == "captures[0], captures[1]");
+    static assert(argsString!r"(foo)...(bar)" == "captures[1], captures[2]");
 }
 
 /**

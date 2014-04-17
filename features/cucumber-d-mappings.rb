@@ -151,7 +151,7 @@ EOF
     add_src <<-EOF
 
 @Match!(r\"#{step_name}\")
-void testFunc_#{@num_steps}(in string[]) {
+void testFunc_#{@num_steps}() {
     #{code}
 }
 
