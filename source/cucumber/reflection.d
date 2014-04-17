@@ -155,7 +155,7 @@ auto conversionsFromString(Types...)() {
         static if(isSomeString!T) {
             convs ~= "";
         } else {
-            convs ~= ".to!" ~ T.stringof;
+            convs ~= ".to!" ~ Unqual!T.stringof;
         }
     }
     return convs;
@@ -193,10 +193,16 @@ string argsStringWithParens(string reg, alias func)() {
 unittest {
     void func() {}
     static assert(argsString!(r"", func) == "");
+
     void func_is(int, string) {}
     static assert(argsString!(r"(foo)...(bar)", func_is) == "captures[1].to!int, captures[2]");
+
+    void func_cis(in int, in string) {}
+    static assert(argsString!(r"(foo)...(bar)", func_cis) == "captures[1].to!int, captures[2]");
+
     void func_si(string, int) {}
     static assert(argsString!(r"(foo)...(bar)", func_si) == "captures[1], captures[2].to!int");
+
     void func_dd(double, double) {}
     static assert(argsString!(r"(foo)...(bar)", func_dd) == "captures[1].to!double, captures[2].to!double");
 }
