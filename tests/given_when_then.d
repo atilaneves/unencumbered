@@ -7,22 +7,22 @@ import cucumber.feature;
 private string[] funcCalls;
 
 @Given!(r"^A situation$")
-void given(in string[]) {
+void given() {
     funcCalls ~= "Given";
 }
 
 @When!(r"^I do this")
-void when(in string[]) {
+void when() {
     funcCalls ~= "When";
 }
 
 @Then!(r"^This happens")
-void then(in string[]) {
+void then() {
     funcCalls ~= "Then";
 }
 
 @When!(r"I do a failing step$")
-void failingStep(in string[]) {
+void failingStep() {
     funcCalls ~= "failingStep";
     throw new Exception("Exception: step failed");
 }
