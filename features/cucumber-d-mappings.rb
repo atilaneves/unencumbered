@@ -50,80 +50,11 @@ module CucumberDMappings
   end
 
   def write_calculator_code
-    add_src <<-EOF
-
-struct Calculator {
-    double result;
-
-    void add(T...)(T args) {
-        writeln("Adding args ", args);
-        result = 0;
-        foreach(a; args) result += a;
-    }
-
-    void computePi() {
-        result = PI;
-    }
-}
-
-private Calculator calculator;
-
-bool closeEnough(T, U)(T a, U b) {
-    return abs(a - b) < 1e-6;
-}
-
-EOF
+    include_file("../tests/calculator/impl.d")
   end
 
   def write_mappings_for_calculator
-    add_src <<-EOF
-
-@Given!(r"^a calculator$")
-void initCalculator(in string[]) {
-    calculator = Calculator();
-}
-
-@When!(r"^the calculator computes PI$")
-void calculatorComputesPi(in string[]) {
-    calculator.computePi();
-}
-
-@Then!(r"^the calculator returns PI$")
-void calculatorReturns(in string[]) {
-    writeln("returns pi");
-    checkTrue(closeEnough(calculator.result, PI));
-}
-
-@When!(`^the calculator adds up "?([0-9.]+)"? and "?([0-9.]+)"?$`)
-void whenAddsUp(in string[] captures) {
-    writeln("adding ", captures[1], " to ", captures[2]);
-    calculator.add(captures[1].to!double, captures[2].to!double);
-}
-
-@And!(r"^the calculator adds up ([0-9.]+) and ([0-9.]+)$")
-void andAddsUp(in string[] captures) {
-    writeln("and adds up ", captures[1], " to ", captures[2]);
-    calculator.add(captures[1].to!double, captures[2].to!double);
-}
-
-@When!(`the calculator adds up "([0-9.]+)", "([0-9.]+)" and "([0-9.]+)"`)
-void whenAdds3(in string[] captures) {
-    writeln("and adds up ", captures[1], ", ", captures[2], " to ", captures[3]);
-    calculator.add(captures[1].to!double, captures[2].to!double, captures[3].to!double);
-}
-
-@But!(r"^the calculator does not return 3$")
-void butDoesNot(in string[]) {
-    checkFalse(closeEnough(calculator.result, 3));
-}
-
-@Then!(`^the calculator returns "(.+)"`)
-void thenReturnsPi(in string[] captures) {
-    writeln("returns capture");
-    checkTrue(closeEnough(calculator.result, captures[1].to!double));
-}
-
-EOF
+    include_file("../tests/calculator/steps.d")
   end
 
   def write_custom_world_constructor
@@ -228,15 +159,19 @@ EOF
   end
 
   def write_src
-    add_src <<-EOF
+    write_main_function
+    write_file('/tmp/foo.d', @code)
+    puts "/tmp/foo.d:\n#{@code}\n"
+  end
+
+  def write_main_function
+        add_src <<-EOF
 int main() {
     const results = runFeature!__MODULE__(#{read_steps});
     writeln(results.toString());
     return results.numFailing ? 1 : 0;
 }
 EOF
-    write_file('/tmp/foo.d', @code)
-    puts "/tmp/foo.d:\n#{@code}\n"
   end
 
   def compile()
@@ -254,6 +189,13 @@ EOF
     lines.map { |l| l.chomp }.select { |l| !l.empty? }
   end
 
+  def include_file(relative_file_path)
+    absolute_file_path = get_absolute_path(relative_file_path)
+    lines = File.readlines(absolute_file_path)
+    lines = lines.select {|l| l !~ /^module .+;$/}
+    lines = lines.select {|l| l !~ /^import tests\..+$/}
+    lines.each { |l| add_src l }
+  end
 end
 
 World(CucumberDMappings)
