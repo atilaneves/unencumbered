@@ -100,24 +100,49 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
     return steps;
 }
 
+/**
+ * Normally this struct wouldn't exist and I'd use a delegate.
+ * But for the wire protocol I need access to the captures
+ * array so it's a struct.
+ */
+struct MatchResult {
+    CucumberStepFunction func;
+    string[] captures;
+    this(CucumberStepFunction func, string[] captures) {
+        this.func = func;
+        this.captures = captures;
+    }
+
+    void opCall() {
+        if(func is null) throw new Exception("MatchResult with null function");
+        func(captures);
+    }
+
+    bool opCast(T: bool)() {
+        return func !is null;
+    }
+}
+
 
 /**
  * Finds the match to a step string. Checks all steps and loops
  * over to see which one has a matching regex. Steps are found
- * at compile-time. Returns the associated function.
+ * at compile-time.
  */
-auto findMatchFunction(ModuleNames...)(string step_str) {
+auto findMatch(ModuleNames...)(string step_str) {
     step_str = stripCucumberKeywords(step_str);
     enum steps = findSteps!ModuleNames;
     foreach(step; steps) {
         auto m = step_str.match(step.regex);
         if(m) {
             import std.array;
-            return () { step.func(m.captures.array); };
+            return MatchResult(step.func, m.captures.array);
         }
     }
-    return null;
+
+    return MatchResult();
 }
+
 
 /**
  * Counts the number of parentheses pairs in a string known
