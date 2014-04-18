@@ -30,3 +30,7 @@ private void handle(TCPConnection tcpConnection, in string request) {
         tcpConnection.send(`["success",[]]`);
     }
 }
+
+string handleRequest(in string request) {
+    return(`["fail"]`);
+}
