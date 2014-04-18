@@ -104,7 +104,7 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
 /**
  * Finds the match to a step string. Checks all steps and loops
  * over to see which one has a matching regex. Steps are found
- * at compile-time.
+ * at compile-time. Returns the associated function.
  */
 auto findMatch(ModuleNames...)(string step_str) {
     step_str = stripCucumberKeywords(step_str);
