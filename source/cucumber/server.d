@@ -5,11 +5,11 @@ import std.stdio;
 
 
 void runCucumberServer(ModuleNames...)(ushort port) {
-    listenTCP_s(54321, &accept);
+    listenTCP_s(54321, &accept!ModuleNames);
 }
 
 
-private void accept(TCPConnection tcpConnection) {
+private void accept(ModuleNames...)(TCPConnection tcpConnection) {
     while(tcpConnection.connected) {
         auto bytes = tcpConnection.readLine(size_t.max, "\n");
         handle(tcpConnection, (cast(string)bytes).strip());
@@ -18,11 +18,11 @@ private void accept(TCPConnection tcpConnection) {
     if(tcpConnection.connected) tcpConnection.close();
 }
 
-private void send(TCPConnection tcpConnection, in string str) {
+private void send(ModuleNames...)(TCPConnection tcpConnection, in string str) {
     tcpConnection.write(str ~ "\n"); //I don't know why writeln doesn't work
 }
 
-private void handle(TCPConnection tcpConnection, in string request) {
+private void handle(ModuleNames...)(TCPConnection tcpConnection, in string request) {
     debug writeln("\nRequest:\n", request, "\n");
     if(request == `["begin_scenario",{"tags":["wire"]}]`) tcpConnection.send(`["success"]`);
     else {
