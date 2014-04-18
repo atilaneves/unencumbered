@@ -24,11 +24,7 @@ private void send(ModuleNames...)(TCPConnection tcpConnection, in string str) {
 
 private void handle(ModuleNames...)(TCPConnection tcpConnection, in string request) {
     debug writeln("\nRequest:\n", request, "\n");
-    if(request == `["begin_scenario",{"tags":["wire"]}]`) tcpConnection.send(`["success"]`);
-    else {
-        debug writeln("oops");
-        tcpConnection.send(`["success",[]]`);
-    }
+    tcpConnection.send(handleRequest!ModuleNames(request));
 }
 
 string handleRequest(ModuleNames...)(string request) {
