@@ -31,6 +31,17 @@ private void handle(TCPConnection tcpConnection, in string request) {
     }
 }
 
-string handleRequest(in string request) {
-    return(`["fail"]`);
+string handleRequest(ModuleNames...)(string request) {
+    debug writeln("handleRequest for ", request);
+    const fail = `["fail"]`;
+    try {
+        const json = parseJson(request);
+        debug writeln("constructed json: ", json);
+        if(json[0].get!string != "step_matches") return fail;
+        return `["success",[]]`;
+    } catch(Exception ex) {
+        stderr.writeln("Error processing request: ", request);
+        stderr.writeln("Exception: ", ex);
+        return fail;
+    }
 }
