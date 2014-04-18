@@ -10,11 +10,11 @@ import std.math;
 void testCalculatorSteps() {
     const givenStep = "    Given a calculator";
     writelnUt("Checking the step \"", givenStep, "\" is not null");
-    checkNotNull(findMatch!"tests.calculator.steps"(givenStep));
+    checkNotNull(findMatchFunction!"tests.calculator.steps"(givenStep));
 
     const whenStep = "    When the calculator adds up \"3\", \"4\" and \"5\"";
     writelnUt(`Calling the step "`, whenStep, `"`);
-    findMatch!"tests.calculator.steps"(whenStep)();
+    findMatchFunction!"tests.calculator.steps"(whenStep)();
 }
 
 void testCalculator() {

@@ -80,14 +80,14 @@ void testFindMatchSteps() {
 void testFindMatch() {
     reflectionFuncCalls = [];
 
-    findMatch!__MODULE__("I match step1")();
+    findMatchFunction!__MODULE__("I match step1")();
     checkEqual(reflectionFuncCalls, ["step1"]);
 
-    findMatch!__MODULE__("I think I match step2......")(); //extra chars, still matches
+    findMatchFunction!__MODULE__("I think I match step2......")(); //extra chars, still matches
     checkEqual(reflectionFuncCalls, ["step1", "step2"]);
-    findMatch!__MODULE__("Ooh, step3")();
+    findMatchFunction!__MODULE__("Ooh, step3")();
     checkEqual(reflectionFuncCalls, ["step1", "step2", "step3"]);
 
-    checkNull(findMatch!__MODULE__("Ooh, step3."));
-    checkNull(findMatch!__MODULE__("random garbage"));
+    checkNull(findMatchFunction!__MODULE__("Ooh, step3."));
+    checkNull(findMatchFunction!__MODULE__("random garbage"));
 }

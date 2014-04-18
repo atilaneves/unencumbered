@@ -106,7 +106,7 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
  * over to see which one has a matching regex. Steps are found
  * at compile-time. Returns the associated function.
  */
-auto findMatch(ModuleNames...)(string step_str) {
+auto findMatchFunction(ModuleNames...)(string step_str) {
     step_str = stripCucumberKeywords(step_str);
     enum steps = findSteps!ModuleNames;
     foreach(step; steps) {

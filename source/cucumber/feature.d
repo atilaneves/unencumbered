@@ -37,7 +37,7 @@ auto runFeature(Modules...)(string[] input) {
         if(line.startsWith("Feature:")) continue;
         if(line.startsWith("Scenario:")) continue;
 
-        auto func = findMatch!Modules(line);
+        auto func = findMatchFunction!Modules(line);
         if(func is null) {
             import std.stdio;
             writeln("Could not find match for ", line);
