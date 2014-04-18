@@ -22,3 +22,19 @@ void testOneMatch() {
     checkTrue(match);
     checkNumCaptures(match.captures, 0);
 }
+
+private int result;
+
+@Match!`I add (\d+) and (\d+)`
+void addTwo(int a, int b) {
+    result = a + b;
+}
+
+void testAddTwo() {
+    const step_str = "I add 3 and 5";
+    const func = findMatch!__MODULE__(step_str);
+    result = 0;
+    func();
+    checkEqual(result, 8);
+    checkEqual(func.captures, [step_str, "3", "5"]);
+}

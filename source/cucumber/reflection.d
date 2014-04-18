@@ -113,7 +113,7 @@ struct MatchResult {
         this.captures = captures;
     }
 
-    void opCall() {
+    void opCall() const {
         if(func is null) throw new Exception("MatchResult with null function");
         func(captures);
     }
