@@ -36,7 +36,8 @@ def write_dub_json
     "targetType": "executable",
     "dependencies": {
         "vibe-d": "~master"
-    }
+    },
+    "versions": ["VibeDefaultMain"]
 }
 EOF
 
@@ -48,25 +49,33 @@ def write_app_src(port, table)
     regexps = requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
 
     lines = <<-EOF
-import cucumber;
+
+module cucumber.app;
+import cucumber.server;
+import cucumber.keywords;
+import vibe.d;
 
 @Match!r\"#{regexps[0]}\"
 void match() {
 }
 
 shared static this() {
+    debug {
+        setLogLevel(LogLevel.debugV);
+    }
+
     runCucumberServer!__MODULE__(#{port});
 }
 
 EOF
 
-  write_file('/tmp/source/app.d', lines)
-  puts "/tmp/source/app.d:\n#{lines}"
+  write_file('/tmp/source/cucumber/app.d', lines)
+  puts "/tmp/source/cucumber/app.d:\n#{lines}"
 
 end
 
 def copy_unencumbered
-  FileUtils.cp_r(get_absolute_path("../source"), "/tmp/source")
+  FileUtils.cp_r(get_absolute_path("../source"), "/tmp/")
 end
 
 Given(/^there is a wire server running on port (\d+) which understands the following protocol:$/) do |port, table|
