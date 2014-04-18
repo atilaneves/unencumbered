@@ -39,4 +39,5 @@ void testAddTwo() {
     checkEqual(result, 8);
     checkEqual(func.captures, [step_str, "3", "5"]);
     checkEqual(func.id, 2);
+    checkEqual(func.regex, `I add (\d+) and (\d+)`);
 }

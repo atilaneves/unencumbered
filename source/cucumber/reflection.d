@@ -40,6 +40,7 @@ alias CucumberStepFunction = void function(in string[] = []);
 struct CucumberStep {
     this(CucumberStepFunction func, in string reg, int id) {
         this(func, std.regex.regex(reg), id);
+        this.regexString = reg;
     }
 
     this(CucumberStepFunction func, Regex!char reg, int id) {
@@ -50,6 +51,7 @@ struct CucumberStep {
 
     CucumberStepFunction func;
     Regex!char regex;
+    string regexString;
     int id; //automatically generated id
 }
 
@@ -111,10 +113,12 @@ struct MatchResult {
     CucumberStepFunction func;
     string[] captures;
     int id;
-    this(CucumberStepFunction func, string[] captures, int id) {
+    string regex;
+    this(CucumberStepFunction func, string[] captures, int id, string regex) {
         this.func = func;
         this.captures = captures;
         this.id = id;
+        this.regex = regex;
     }
 
     void opCall() const {
@@ -140,7 +144,7 @@ auto findMatch(ModuleNames...)(string step_str) {
         auto m = step_str.match(step.regex);
         if(m) {
             import std.array;
-            return MatchResult(step.func, m.captures.array, step.id);
+            return MatchResult(step.func, m.captures.array, step.id, step.regexString);
         }
     }
 
