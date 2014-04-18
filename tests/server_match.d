@@ -6,7 +6,7 @@ import unit_threaded;
 
 
 void testNoMatches() {
-    checkEqual(findMatch!__MODULE__("foobarbaz"), MatchResult(null, []));
+    checkEqual(findMatch!__MODULE__("foobarbaz"), MatchResult.init);
 }
 
 @Match!`^we're wired$`
@@ -21,6 +21,7 @@ void testOneMatch() {
     auto match = findMatch!__MODULE__("we're wired");
     checkTrue(match);
     checkNumCaptures(match.captures, 0);
+    checkEqual(match.id, 1); //1st one in the file
 }
 
 private int result;
@@ -37,4 +38,5 @@ void testAddTwo() {
     func();
     checkEqual(result, 8);
     checkEqual(func.captures, [step_str, "3", "5"]);
+    checkEqual(func.id, 2);
 }

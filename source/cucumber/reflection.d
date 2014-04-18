@@ -38,18 +38,19 @@ unittest {
 alias CucumberStepFunction = void function(in string[] = []);
 
 struct CucumberStep {
-    this(CucumberStepFunction func, Regex!char reg) {
-        this.func = func;
-        this.regex = reg;
+    this(CucumberStepFunction func, in string reg, int id) {
+        this(func, std.regex.regex(reg), id);
     }
 
-    this(CucumberStepFunction func, in string reg) {
+    this(CucumberStepFunction func, Regex!char reg, int id) {
         this.func = func;
-        this.regex = std.regex.regex(reg);
+        this.regex = reg;
+        this.id = id;
     }
 
     CucumberStepFunction func;
     Regex!char regex;
+    int id; //automatically generated id
 }
 
 
@@ -62,6 +63,7 @@ struct CucumberStep {
 auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleNames)))) {
     mixin(importModulesString!ModuleNames);
     CucumberStep steps[];
+    int id;
     foreach(mod; ModuleNames) {
         foreach(member; __traits(allMembers, mixin(mod))) {
 
@@ -89,7 +91,7 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
                     enum lambda = "(captures) { " ~ funcCall ~ " }";
 
                     //e.g. steps ~= CucumberStep((in string[] cs) { myfunc(); }, r"foobar");
-                    enum mixinStr = `steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `);`;
+                    enum mixinStr = `steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `, ++id);`;
 
                     mixin(mixinStr);
                 }
@@ -108,9 +110,11 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
 struct MatchResult {
     CucumberStepFunction func;
     string[] captures;
-    this(CucumberStepFunction func, string[] captures) {
+    int id;
+    this(CucumberStepFunction func, string[] captures, int id) {
         this.func = func;
         this.captures = captures;
+        this.id = id;
     }
 
     void opCall() const {
@@ -136,7 +140,7 @@ auto findMatch(ModuleNames...)(string step_str) {
         auto m = step_str.match(step.regex);
         if(m) {
             import std.array;
-            return MatchResult(step.func, m.captures.array);
+            return MatchResult(step.func, m.captures.array, step.id);
         }
     }
 
