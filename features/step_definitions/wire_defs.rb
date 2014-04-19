@@ -44,10 +44,8 @@ EOF
   write_file("/tmp/dub.json", dub)
 end
 
-def write_app_src(port, table)
-  requests = table.hashes.map {|h| JSON.parse(h["request"])}
-  responses = table.hashes.map {|h| JSON.parse(h["response"])}
-  regexps = requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
+
+def get_funcs_string(responses, regexps)
   funcs = ""
   idx = 1
   responses.each do |response|
@@ -61,16 +59,26 @@ def write_app_src(port, table)
     funcs += "void func_#{idx}() { }\n"
     idx += 1
   end
+  funcs
+end
 
-  details = ""
+def get_details_string(responses)
   responses.each do |response|
     response[1].each do |info|
       if info.keys.include? "source"
-        details = ", Yes.details"
-        break
+        return ", Yes.details"
       end
     end
   end
+  ""
+end
+
+def write_app_src(port, table)
+  requests = table.hashes.map {|h| JSON.parse(h["request"])}
+  responses = table.hashes.map {|h| JSON.parse(h["response"])}
+  regexps = requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
+  funcs = get_funcs_string(responses, regexps)
+  details = get_details_string(responses)
 
   lines = <<-EOF
 module cucumber.app;
