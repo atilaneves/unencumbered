@@ -54,6 +54,7 @@ module cucumber.app;
 import cucumber.server;
 import cucumber.keywords;
 import vibe.d;
+import std.stdio;
 
 @Match!r\"#{regexps[0]}\"
 void match() {
@@ -62,6 +63,7 @@ void match() {
 shared static this() {
     debug {
         setLogLevel(LogLevel.debugV);
+        writeln("Running the Cucumber server");
     }
 
     runCucumberServer!__MODULE__(#{port});
