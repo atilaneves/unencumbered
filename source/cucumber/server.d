@@ -15,9 +15,6 @@ private void accept(ModuleNames...)(TCPConnection tcpConnection) {
     debug writeln("Accepting a connection");
     while(tcpConnection.connected) {
         auto bytes = tcpConnection.readLine(size_t.max, "\n");
-        //auto bytes = new ubyte[tcpConnection.leastSize];
-        //tcpConnection.read(bytes);
-
         handle!ModuleNames(tcpConnection, (cast(string)bytes).strip());
     }
 
