@@ -48,8 +48,18 @@ def write_app_src(port, table)
   requests = table.hashes.map {|h| JSON.parse(h["request"])}
   responses = table.hashes.map {|h| JSON.parse(h["response"])}
   regexps = requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
-  if responses[0][1].length == 0
-    regexps = "foobarbazlkfafdsakdsfa"
+  funcs = ""
+  idx = 1
+  responses.each do |response|
+    regexp = regexps.shift
+    if response[1].length > 0
+      funcs += "@Match!r\"#{regexp}\"\n"
+    else
+      funcs += "@Match!r\"falkacpioiwervl\"\n"
+    end
+
+    funcs += "void func_#{idx}() { }\n"
+    idx += 1
   end
 
   lines = <<-EOF
@@ -60,9 +70,7 @@ import cucumber.keywords;
 import vibe.d;
 import std.stdio;
 
-@Match!r\"#{regexps[0]}\"
-void match() {
-}
+#{funcs}
 
 shared static this() {
     debug {
