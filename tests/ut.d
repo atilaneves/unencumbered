@@ -6,5 +6,5 @@ int main(string[] args) {
     writeln(`Running unit tests from dirs ["tests"]
 `);
     return args.runTests!("tests.reflection", "tests.match", "tests.given_when_then", "tests.keywords",
-                          "tests.calculator.feature");
+                          "tests.calculator.feature", "tests.server_match", "tests.server");
 }

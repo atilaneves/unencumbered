@@ -38,18 +38,21 @@ unittest {
 alias CucumberStepFunction = void function(in string[] = []);
 
 struct CucumberStep {
-    this(CucumberStepFunction func, Regex!char reg) {
-        this.func = func;
-        this.regex = reg;
+    this(CucumberStepFunction func, in string reg, int id) {
+        this(func, std.regex.regex(reg), id);
+        this.regexString = reg;
     }
 
-    this(CucumberStepFunction func, in string reg) {
+    this(CucumberStepFunction func, Regex!char reg, int id) {
         this.func = func;
-        this.regex = std.regex.regex(reg);
+        this.regex = reg;
+        this.id = id;
     }
 
     CucumberStepFunction func;
     Regex!char regex;
+    string regexString;
+    int id; //automatically generated id
 }
 
 
@@ -62,6 +65,7 @@ struct CucumberStep {
 auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleNames)))) {
     mixin(importModulesString!ModuleNames);
     CucumberStep steps[];
+    int id;
     foreach(mod; ModuleNames) {
         foreach(member; __traits(allMembers, mixin(mod))) {
 
@@ -89,7 +93,7 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
                     enum lambda = "(captures) { " ~ funcCall ~ " }";
 
                     //e.g. steps ~= CucumberStep((in string[] cs) { myfunc(); }, r"foobar");
-                    enum mixinStr = `steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `);`;
+                    enum mixinStr = `steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `, ++id);`;
 
                     mixin(mixinStr);
                 }
@@ -98,6 +102,33 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
     }
 
     return steps;
+}
+
+/**
+ * Normally this struct wouldn't exist and I'd use a delegate.
+ * But for the wire protocol I need access to the captures
+ * array so it's a struct.
+ */
+struct MatchResult {
+    CucumberStepFunction func;
+    string[] captures;
+    int id;
+    string regex;
+    this(CucumberStepFunction func, string[] captures, int id, string regex) {
+        this.func = func;
+        this.captures = captures;
+        this.id = id;
+        this.regex = regex;
+    }
+
+    void opCall() const {
+        if(func is null) throw new Exception("MatchResult with null function");
+        func(captures);
+    }
+
+    bool opCast(T: bool)() {
+        return func !is null;
+    }
 }
 
 
@@ -113,11 +144,13 @@ auto findMatch(ModuleNames...)(string step_str) {
         auto m = step_str.match(step.regex);
         if(m) {
             import std.array;
-            return () { step.func(m.captures.array); };
+            return MatchResult(step.func, m.captures.array, step.id, step.regexString);
         }
     }
-    return null;
+
+    return MatchResult();
 }
+
 
 /**
  * Counts the number of parentheses pairs in a string known

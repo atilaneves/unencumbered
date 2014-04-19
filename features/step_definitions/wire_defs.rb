@@ -1,5 +1,6 @@
 require 'socket'
 require 'timeout'
+require 'json'
 
 After do
   @socket.nil? or @socket.close
@@ -35,56 +36,67 @@ def write_dub_json
     "targetType": "executable",
     "dependencies": {
         "vibe-d": "~master"
-    }
+    },
+    "versions": ["VibeDefaultMain"]
 }
 EOF
 
   write_file("/tmp/dub.json", dub)
 end
 
-def write_app_src
-    lines = <<-EOF
+def write_app_src(port, table)
+  requests = table.hashes.map {|h| JSON.parse(h["request"])}
+  responses = table.hashes.map {|h| JSON.parse(h["response"])}
+  regexps = requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
+  funcs = ""
+  idx = 1
+  responses.each do |response|
+    regexp = regexps.shift
+    if response[1].length > 0
+      funcs += "@Match!r\"#{regexp}\"\n"
+    else
+      funcs += "@Match!r\"falkacpioiwervl\"\n"
+    end
+
+    funcs += "void func_#{idx}() { }\n"
+    idx += 1
+  end
+
+  lines = <<-EOF
+module cucumber.app;
+
+import cucumber.server;
+import cucumber.keywords;
 import vibe.d;
 import std.stdio;
-import std.string;
+
+#{funcs}
 
 shared static this() {
-    setLogLevel(LogLevel.debugV);
-    listenTCP_s(54321, &accept);
-}
-
-void accept(TCPConnection tcpConnection) {
-    while(tcpConnection.connected) {
-        auto bytes = tcpConnection.readLine(size_t.max, "\n");
-        handle(tcpConnection, (cast(string)bytes).strip());
+    debug {
+        setLogLevel(LogLevel.debugV);
+        writeln("Running the Cucumber server");
     }
 
-    if(tcpConnection.connected) tcpConnection.close();
-}
-
-void send(TCPConnection tcpConnection, in string str) {
-    tcpConnection.write(str ~ "\n"); //I don't know why writeln doesn't work
-}
-
-void handle(TCPConnection tcpConnection, in string request) {
-    debug writeln("\nRequest:\n", request, "\n");
-    if(request == `["begin_scenario",{"tags":["wire"]}]`) tcpConnection.send(`["success"]`);
-    else {
-        debug writeln("oops");
-        tcpConnection.send(`["success",[]]`);
-    }
+    runCucumberServer!__MODULE__(#{port});
 }
 
 EOF
-  write_file('/tmp/source/app.d', lines)
-  puts "/tmp/source/app.d:\n#{lines}"
+
+  write_file('/tmp/source/cucumber/app.d', lines)
+  puts "/tmp/source/cucumber/app.d:\n#{lines}"
 
 end
 
-Given(/^there is a wire server running on port (\d+) which understands the following protocol:$/) do |port, table|
+def copy_unencumbered
+  FileUtils.cp_r(get_absolute_path("../source"), "/tmp/")
+end
 
+Given(/^there is a wire server running on port (\d+) which understands the following protocol:$/) do |port, table|
   # table is a Cucumber::Ast::Table
+  puts "table is #{table}"
+  copy_unencumbered
   write_dub_json
-  write_app_src
+  write_app_src(port, table)
   connect_to_server(port)
 end

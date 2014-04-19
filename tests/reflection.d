@@ -88,6 +88,9 @@ void testFindMatch() {
     findMatch!__MODULE__("Ooh, step3")();
     checkEqual(reflectionFuncCalls, ["step1", "step2", "step3"]);
 
-    checkNull(findMatch!__MODULE__("Ooh, step3."));
-    checkNull(findMatch!__MODULE__("random garbage"));
+    checkFalse(findMatch!__MODULE__("Ooh, step3."));
+    checkThrown!Exception(findMatch!__MODULE__("Ooh, step3.")());
+
+    checkFalse(findMatch!__MODULE__("random garbage"));
+    checkThrown!Exception(findMatch!__MODULE__("random garbage")());
 }
