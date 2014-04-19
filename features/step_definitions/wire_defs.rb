@@ -44,6 +44,23 @@ EOF
   write_file("/tmp/dub.json", dub)
 end
 
+def get_regexps(requests, responses)
+  puts "responses are #{responses}"
+  response_infos = responses.map { |r| r[1] }
+  regexps = []
+  puts "responseinfos are #{response_infos}"
+  response_infos.each do |response|
+    response.each do |info|
+      puts "info is #{info}"
+      if not info.keys.include?('regexp')
+        return requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
+      end
+      regexps << info['regexp']
+    end
+  end
+  regexps
+end
+
 
 def get_funcs_string(responses, regexps)
   funcs = ""
@@ -63,8 +80,8 @@ def get_funcs_string(responses, regexps)
 end
 
 def get_details_string(responses)
-  responses.each do |response|
-    response[1].each do |info|
+  responses.map { |r| r[1] }.each do |response|
+    response.each do |info|
       if info.keys.include? "source"
         return ", Yes.details"
       end
@@ -76,7 +93,7 @@ end
 def write_app_src(port, table)
   requests = table.hashes.map {|h| JSON.parse(h["request"])}
   responses = table.hashes.map {|h| JSON.parse(h["response"])}
-  regexps = requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
+  regexps = get_regexps(requests, responses)
   funcs = get_funcs_string(responses, regexps)
   details = get_details_string(responses)
 
