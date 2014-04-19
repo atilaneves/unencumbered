@@ -62,6 +62,16 @@ def write_app_src(port, table)
     idx += 1
   end
 
+  details = ""
+  responses.each do |response|
+    response[1].each do |info|
+      if info.keys.include? "source"
+        details = ", Yes.details"
+        break
+      end
+    end
+  end
+
   lines = <<-EOF
 module cucumber.app;
 
@@ -78,7 +88,7 @@ shared static this() {
         writeln("Running the Cucumber server");
     }
 
-    runCucumberServer!__MODULE__(#{port});
+    runCucumberServer!__MODULE__(#{port}#{details});
 }
 
 EOF

@@ -3,7 +3,7 @@ module cucumber.server;
 import cucumber.reflection;
 import vibe.d;
 import std.stdio;
-
+public import std.typecons: Flag, Yes, No;
 
 void runCucumberServer(ModuleNames...)(ushort port) {
     debug writeln("Running the Cucumber server");
@@ -32,7 +32,7 @@ private void handle(ModuleNames...)(TCPConnection tcpConnection, in string reque
     tcpConnection.send(reply);
 }
 
-string handleRequest(ModuleNames...)(string request) {
+string handleRequest(ModuleNames...)(string request, Flag!"details" details = No.details) {
     const fail = `["fail"]`;
 
     try {
@@ -45,6 +45,11 @@ string handleRequest(ModuleNames...)(string request) {
         auto infoElem = Json.emptyObject;
         infoElem.id = func.id.to!string;
         infoElem.args = Json.emptyArray;
+
+        if(details) {
+            infoElem.regexp = "^we're wired$";
+            infoElem.source = "tests.server.match1:17";
+        }
 
         auto info = Json.emptyArray;
         info ~= infoElem;
