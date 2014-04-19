@@ -1,5 +1,6 @@
 module cucumber.server;
 
+import cucumber.reflection;
 import vibe.d;
 import std.stdio;
 
@@ -30,14 +31,28 @@ private void handle(ModuleNames...)(TCPConnection tcpConnection, in string reque
 string handleRequest(ModuleNames...)(string request) {
     debug writeln("handleRequest for ", request);
     const fail = `["fail"]`;
+
     try {
         const json = parseJson(request);
-        debug writeln("constructed json: ", json);
         if(json[0].get!string != "step_matches") return fail;
-        return `["success",[]]`;
-    } catch(Exception ex) {
+
+        auto func = findMatch!ModuleNames(json[1]["name_to_match"].get!string);
+        if(!func) return `["success",[]]`;
+
+        auto reply = Json.emptyArray;
+        reply ~= "success";
+        writeln("reply: ", reply);
+
+        auto info = Json.emptyObject;
+        info.id = func.id.to!string;
+        info.args = Json.emptyArray;
+
+        reply ~= info;
+
+        return reply.toString();
+    } catch(Throwable ex) {
         stderr.writeln("Error processing request: ", request);
-        stderr.writeln("Exception: ", ex);
+        stderr.writeln("Exception: ", ex.toString().sanitize());
         return fail;
     }
 }

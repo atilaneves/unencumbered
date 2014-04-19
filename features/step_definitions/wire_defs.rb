@@ -79,8 +79,8 @@ def copy_unencumbered
 end
 
 Given(/^there is a wire server running on port (\d+) which understands the following protocol:$/) do |port, table|
-
   # table is a Cucumber::Ast::Table
+  puts "table is #{table}"
   copy_unencumbered
   write_dub_json
   write_app_src(port, table)
