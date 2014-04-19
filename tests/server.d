@@ -46,7 +46,7 @@ void testMatchesDetails() {
 
         checkEqual(json[1][0].id.to!int, 1);
         checkEqual(json[1][0].args.length.to!int, 0);
-        checkEqual(json[1][0].source.to!string, "tests.server.match1:17");
+        checkEqual(json[1][0].source.to!string, "tests.server.match1");
         checkEqual(json[1][0].regexp.to!string, "^we're wired$");
     }
     {
@@ -59,7 +59,7 @@ void testMatchesDetails() {
 
         checkEqual(json[1][0].id.to!int, 2);
         checkEqual(json[1][0].args.length.to!int, 0);
-        checkEqual(json[1][0].source.to!string, "tests.server.match2:21");
+        checkEqual(json[1][0].source.to!string, "tests.server.match2");
         checkEqual(json[1][0].regexp.to!string, "^2nd match$");
     }
 }

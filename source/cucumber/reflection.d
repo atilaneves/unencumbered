@@ -38,21 +38,23 @@ unittest {
 alias CucumberStepFunction = void function(in string[] = []);
 
 struct CucumberStep {
-    this(CucumberStepFunction func, in string reg, int id) {
-        this(func, std.regex.regex(reg), id);
+    this(in CucumberStepFunction func, in string reg, int id, in string source) {
+        this(func, std.regex.regex(reg), id, source);
         this.regexString = reg;
     }
 
-    this(CucumberStepFunction func, Regex!char reg, int id) {
+    this(in CucumberStepFunction func, Regex!char reg, int id, in string source) {
         this.func = func;
         this.regex = reg;
         this.id = id;
+        this.source = source;
     }
 
     CucumberStepFunction func;
     Regex!char regex;
     string regexString;
     int id; //automatically generated id
+    string source;
 }
 
 
@@ -92,8 +94,10 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
                     //e.g. lambda would be "(captures) { myfunc(captures[0]); }"
                     enum lambda = "(captures) { " ~ funcCall ~ " }";
 
-                    //e.g. steps ~= CucumberStep((in string[] cs) { myfunc(); }, r"foobar");
-                    enum mixinStr = `steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `, ++id);`;
+                    enum source = `"` ~ mod ~ "." ~ member ~ `"`;
+
+                    //e.g. steps ~= CucumberStep((in string[] cs) { myfunc(); }, r"foobar", ++id, "foo.bar:3");
+                    enum mixinStr = `steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `, ++id, ` ~ source ~ `);`;
 
                     mixin(mixinStr);
                 }
@@ -111,14 +115,16 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
  */
 struct MatchResult {
     CucumberStepFunction func;
-    string[] captures;
+    const string[] captures;
     int id;
     string regex;
-    this(CucumberStepFunction func, string[] captures, int id, string regex) {
+    string source;
+    this(in CucumberStepFunction func, in string[] captures, in int id, in string regex, in string source) {
         this.func = func;
         this.captures = captures;
         this.id = id;
         this.regex = regex;
+        this.source = source;
     }
 
     void opCall() const {
@@ -144,7 +150,7 @@ auto findMatch(ModuleNames...)(string step_str) {
         auto m = step_str.match(step.regex);
         if(m) {
             import std.array;
-            return MatchResult(step.func, m.captures.array, step.id, step.regexString);
+            return MatchResult(step.func, m.captures.array, step.id, step.regexString, step.source);
         }
     }
 

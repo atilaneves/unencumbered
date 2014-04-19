@@ -47,8 +47,8 @@ string handleRequest(ModuleNames...)(string request, Flag!"details" details = No
         infoElem.args = Json.emptyArray;
 
         if(details) {
-            infoElem.regexp = "^we're wired$";
-            infoElem.source = "tests.server.match1:17";
+            infoElem.regexp = func.regex;
+            infoElem.source = func.source;
         }
 
         auto info = Json.emptyArray;
