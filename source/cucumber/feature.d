@@ -7,6 +7,7 @@ import std.regex;
 import std.conv;
 import std.algorithm;
 import std.traits;
+import std.encoding: sanitize;
 
 struct FeatureResults {
     int numScenarios;
@@ -48,9 +49,9 @@ auto runFeature(Modules...)(string[] input) {
             func();
         } catch(PendingException) {
             return FeatureResults(1, 0, 0, 1);
-        } catch(Exception e) {
+        } catch(Throwable e) {
             import std.stdio;
-            writeln("Exception: ", e.msg);
+            writeln("Exception: ", e.msg.sanitize);
             return FeatureResults(1, 0, 1, 0);
         }
     }
