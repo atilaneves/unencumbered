@@ -45,10 +45,14 @@ EOF
 end
 
 def write_app_src(port, table)
-    requests = table.hashes.map {|h| JSON.parse(h["request"])}
-    regexps = requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
+  requests = table.hashes.map {|h| JSON.parse(h["request"])}
+  responses = table.hashes.map {|h| JSON.parse(h["response"])}
+  regexps = requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
+  if responses[0][1].length == 0
+    regexps = "foobarbazlkfafdsakdsfa"
+  end
 
-    lines = <<-EOF
+  lines = <<-EOF
 module cucumber.app;
 
 import cucumber.server;
