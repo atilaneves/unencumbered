@@ -49,8 +49,8 @@ def write_app_src(port, table)
     regexps = requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
 
     lines = <<-EOF
-
 module cucumber.app;
+
 import cucumber.server;
 import cucumber.keywords;
 import vibe.d;

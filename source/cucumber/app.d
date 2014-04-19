@@ -7,5 +7,5 @@ shared static this() {
     debug {
         setLogLevel(LogLevel.debugV);
     }
-    runCucumberServer!""(54321);
+    runCucumberServer!__MODULE__(54321);
 }

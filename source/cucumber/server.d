@@ -13,13 +13,13 @@ void runCucumberServer(ModuleNames...)(ushort port) {
 private void accept(ModuleNames...)(TCPConnection tcpConnection) {
     while(tcpConnection.connected) {
         auto bytes = tcpConnection.readLine(size_t.max, "\n");
-        handle(tcpConnection, (cast(string)bytes).strip());
+        handle!ModuleNames(tcpConnection, (cast(string)bytes).strip());
     }
 
     if(tcpConnection.connected) tcpConnection.close();
 }
 
-private void send(ModuleNames...)(TCPConnection tcpConnection, in string str) {
+private void send(TCPConnection tcpConnection, in string str) {
     tcpConnection.write(str ~ "\n"); //I don't know why writeln doesn't work
 }
 
