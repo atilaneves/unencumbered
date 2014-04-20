@@ -8,7 +8,7 @@ install:
  - gem install cucumber rspec aruba
  - git clone https://github.com/rejectedsoftware/dub
  - cd dub
- - ./build/sh
+ - ./build.sh
  - cd ..
 script: dub/dub test
 script: cucumber --tags ~@wip features/wire_protocol.feature
