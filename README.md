@@ -1,7 +1,5 @@
 unencumbered
 ============
-[![Build Status](https://travis-ci.org/atilaneves/unencumbered.png?branch=master)](https://travis-ci.org/atilaneves/unencumbered)
-
 Unencumbered allows Cucumber to support step definitions written in D.
 
 This is done by implementing the Cucumber [wire protocol](https://github.com/cucumber/cucumber/wiki/Wire-Protocol).
