@@ -8,7 +8,7 @@ import std.regex;
 import std.conv;
 
 
-private enum isMatchStruct(T) = is(T:Match!S, string S);
+private enum isMatchStruct(T) = is(T:Match!(S, N), string S, ulong N);
 
 unittest {
     static assert(isMatchStruct!(Match!""));
@@ -33,6 +33,27 @@ unittest {
     void bar() {
         static assert(!hasMatchUDA!(bar));
     }
+}
+
+
+private template matchToLineNumber(T: Match!(S, N), string S, ulong N) if(isMatchStruct!T) {
+    enum matchToLineNumber = N;
+}
+
+unittest {
+    static assert(matchToLineNumber!(Match!("foo", 3UL)) == 3);
+    static assert(matchToLineNumber!(Match!("bar", 87UL)) == 87);
+}
+
+enum getLineNumber(alias T) = matchToLineNumber!(Filter!(isMatchStruct, __traits(getAttributes, T))[0]);
+
+unittest {
+    @Match!("foo", 4)
+    void foo() {}
+    static assert(getLineNumber!foo == 4);
+    @Match!("bar", 3)
+    void bar() {}
+    static assert(getLineNumber!bar == 3);
 }
 
 alias CucumberStepFunction = void function(in string[] = []);
@@ -94,7 +115,8 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
                     //e.g. lambda would be "(captures) { myfunc(captures[0]); }"
                     enum lambda = "(captures) { " ~ funcCall ~ " }";
 
-                    enum source = `"` ~ mod ~ "." ~ member ~ `"`;
+                    //e.g. mymod.myfunc:13
+                    enum source = `"` ~ mod ~ "." ~ member ~ `:` ~ getLineNumber!(mixin(member)).to!string ~ `"`;
 
                     //e.g. steps ~= CucumberStep((in string[] cs) { myfunc(); }, r"foobar", ++id, "foo.bar:3");
                     enum mixinStr = `steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `, ++id, ` ~ source ~ `);`;
