@@ -63,7 +63,7 @@ end
 
 
 def get_funcs_string(responses, regexps)
-  funcs = ""
+  funcs = "\n" * 115 # to get the line numbers to match
   idx = 1
   responses.each do |response|
     regexp = regexps.shift
@@ -73,7 +73,7 @@ def get_funcs_string(responses, regexps)
       funcs += "@Match!r\"falkacpioiwervl\"\n"
     end
 
-    funcs += "void func_#{idx}() { }\n"
+    funcs += "void MyClass() { }\n"
     idx += 1
   end
   funcs
@@ -98,7 +98,7 @@ def write_app_src(port, table)
   details = get_details_string(responses)
 
   lines = <<-EOF
-module cucumber.app;
+module MyApp;
 
 import cucumber.server;
 import cucumber.keywords;
@@ -117,9 +117,9 @@ shared static this() {
 }
 
 EOF
-
-  write_file('/tmp/source/cucumber/app.d', lines)
-  puts "/tmp/source/cucumber/app.d:\n#{lines}"
+  filename = '/tmp/source/MyApp.d'
+  write_file(filename, lines)
+  puts "#{filename}:\n#{lines}"
 
 end
 
