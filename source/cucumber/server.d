@@ -11,21 +11,19 @@ import std.conv;
 public import std.typecons: Flag, Yes, No;
 
 alias DetailsFlag = Flag!"details";
-DetailsFlag gDetailsFlag;
 MatchResult[int] gMatches;
 
 void runCucumberServer(ModuleNames...)(ushort port, DetailsFlag details = No.details) {
-    debug writeln("Running the Cucumber server");
-    gDetailsFlag = details;
-    listenTCP_s(54321, &accept!ModuleNames);
+    debug writeln("Running the Cucumber server on port ", port, " details ", details);
+    listenTCP(54321, (tcpConnection) { accept!ModuleNames(tcpConnection, details); });
 }
 
 
-private void accept(ModuleNames...)(TCPConnection tcpConnection) {
+private void accept(ModuleNames...)(TCPConnection tcpConnection, DetailsFlag details) {
     debug writeln("Accepting a connection");
     while(tcpConnection.connected) {
         auto bytes = tcpConnection.readLine(size_t.max, "\n");
-        handle!ModuleNames(tcpConnection, (cast(string)bytes).strip());
+        handleTcpRequest!ModuleNames(tcpConnection, (cast(string)bytes).strip(), details);
     }
 
     if(tcpConnection.connected) tcpConnection.close();
@@ -35,9 +33,9 @@ private void send(TCPConnection tcpConnection, in string str) {
     tcpConnection.write(str ~ "\n"); //I don't know why writeln doesn't work
 }
 
-private void handle(ModuleNames...)(TCPConnection tcpConnection, in string request,
-                                    Flag!"details" details = No.details) {
-    const reply = handleRequest!ModuleNames(request, gDetailsFlag);
+private void handleTcpRequest(ModuleNames...)(TCPConnection tcpConnection, in string request,
+                                              Flag!"details" details) {
+    const reply = handleRequest!ModuleNames(request, details);
     debug writeln("Reply: ", reply);
     tcpConnection.send(reply);
 }
