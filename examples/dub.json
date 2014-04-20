@@ -1,0 +1,10 @@
+{
+    "name": "foo",
+    "targetType": "executable",
+    "dependencies": {
+        "vibe-d": "~master",
+        "unit-threaded": "~master",
+        "unencumbered": "~master"
+    },
+    "versions": ["VibeDefaultMain"]
+}

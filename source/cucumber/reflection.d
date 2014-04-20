@@ -87,7 +87,7 @@ struct CucumberStep {
  */
 auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleNames)))) {
     mixin(importModulesString!ModuleNames);
-    CucumberStep steps[];
+    CucumberStep cucumberSteps[];
     int id;
     foreach(mod; ModuleNames) {
         foreach(member; __traits(allMembers, mixin(mod))) {
@@ -118,8 +118,10 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
                     //e.g. mymod.myfunc:13
                     enum source = `"` ~ mod ~ "." ~ member ~ `:` ~ getLineNumber!(mixin(member)).to!string ~ `"`;
 
-                    //e.g. steps ~= CucumberStep((in string[] cs) { myfunc(); }, r"foobar", ++id, "foo.bar:3");
-                    enum mixinStr = `steps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~ `, ++id, ` ~ source ~ `);`;
+                    //e.g. cucumberSteps ~= CucumberStep((in string[] cs) { myfunc(); }, r"foobar",
+                    //                                   ++id, "foo.bar:3");
+                    enum mixinStr = `cucumberSteps ~= CucumberStep(` ~ lambda ~ `, ` ~ reg ~
+                                                                   `, ++id, ` ~ source ~ `);`;
 
                     mixin(mixinStr);
                 }
@@ -127,7 +129,7 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
         }
     }
 
-    return steps;
+    return cucumberSteps;
 }
 
 /**
