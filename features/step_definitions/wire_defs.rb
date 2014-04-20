@@ -44,11 +44,26 @@ EOF
   write_file("/tmp/dub.json", dub)
 end
 
-def write_app_src(port, table)
-  requests = table.hashes.map {|h| JSON.parse(h["request"])}
-  responses = table.hashes.map {|h| JSON.parse(h["response"])}
-  regexps = requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
-  funcs = ""
+def get_regexps(requests, responses)
+  puts "responses are #{responses}"
+  response_infos = responses.map { |r| r[1] }
+  regexps = []
+  puts "responseinfos are #{response_infos}"
+  response_infos.each do |response|
+    response.each do |info|
+      puts "info is #{info}"
+      if not info.keys.include?('regexp')
+        return requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
+      end
+      regexps << info['regexp']
+    end
+  end
+  regexps
+end
+
+
+def get_funcs_string(responses, regexps)
+  funcs = "\n" * 115 # to get the line numbers to match
   idx = 1
   responses.each do |response|
     regexp = regexps.shift
@@ -58,12 +73,32 @@ def write_app_src(port, table)
       funcs += "@Match!r\"falkacpioiwervl\"\n"
     end
 
-    funcs += "void func_#{idx}() { }\n"
+    funcs += "void MyClass() { }\n"
     idx += 1
   end
+  funcs
+end
+
+def get_details_string(responses)
+  responses.map { |r| r[1] }.each do |response|
+    response.each do |info|
+      if info.keys.include? "source"
+        return ", Yes.details"
+      end
+    end
+  end
+  ""
+end
+
+def write_app_src(port, table)
+  requests = table.hashes.map {|h| JSON.parse(h["request"])}
+  responses = table.hashes.map {|h| JSON.parse(h["response"])}
+  regexps = get_regexps(requests, responses)
+  funcs = get_funcs_string(responses, regexps)
+  details = get_details_string(responses)
 
   lines = <<-EOF
-module cucumber.app;
+module MyApp;
 
 import cucumber.server;
 import cucumber.keywords;
@@ -78,13 +113,13 @@ shared static this() {
         writeln("Running the Cucumber server");
     }
 
-    runCucumberServer!__MODULE__(#{port});
+    runCucumberServer!__MODULE__(#{port}#{details});
 }
 
 EOF
-
-  write_file('/tmp/source/cucumber/app.d', lines)
-  puts "/tmp/source/cucumber/app.d:\n#{lines}"
+  filename = '/tmp/source/MyApp.d'
+  write_file(filename, lines)
+  puts "#{filename}:\n#{lines}"
 
 end
 

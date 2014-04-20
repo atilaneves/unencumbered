@@ -9,7 +9,7 @@ void testNoMatches() {
     checkEqual(findMatch!__MODULE__("foobarbaz"), MatchResult.init);
 }
 
-@Match!`^we're wired$`
+@Match!`^we are wired$`
 void wereWired() {
 }
 
@@ -18,7 +18,7 @@ private void checkNumCaptures(in string[] captures, int num) {
 }
 
 void testOneMatch() {
-    auto match = findMatch!__MODULE__("we're wired");
+    auto match = findMatch!__MODULE__("we are wired");
     checkTrue(match);
     checkNumCaptures(match.captures, 0);
     checkEqual(match.id, 1); //1st one in the file

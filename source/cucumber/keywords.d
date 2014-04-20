@@ -2,7 +2,7 @@ module cucumber.keywords;
 
 import std.string;
 
-struct Match(string reg) { }
+struct Match(string reg, ulong line = __LINE__) { }
 alias Given = Match;
 alias When = Match;
 alias Then = Match;

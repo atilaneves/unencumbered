@@ -3,10 +3,14 @@ module cucumber.server;
 import cucumber.reflection;
 import vibe.d;
 import std.stdio;
+public import std.typecons: Flag, Yes, No;
 
+alias DetailsFlag = Flag!"details";
+DetailsFlag gDetailsFlag;
 
-void runCucumberServer(ModuleNames...)(ushort port) {
+void runCucumberServer(ModuleNames...)(ushort port, DetailsFlag details = No.details) {
     debug writeln("Running the Cucumber server");
+    gDetailsFlag = details;
     listenTCP_s(54321, &accept!ModuleNames);
 }
 
@@ -25,14 +29,15 @@ private void send(TCPConnection tcpConnection, in string str) {
     tcpConnection.write(str ~ "\n"); //I don't know why writeln doesn't work
 }
 
-private void handle(ModuleNames...)(TCPConnection tcpConnection, in string request) {
+private void handle(ModuleNames...)(TCPConnection tcpConnection, in string request,
+                                    Flag!"details" details = No.details) {
     debug writeln("\nRequest:\n", request, "\n");
-    const reply = handleRequest!ModuleNames(request);
+    const reply = handleRequest!ModuleNames(request, gDetailsFlag);
     debug writeln("\nReply:\n", reply, "\n");
     tcpConnection.send(reply);
 }
 
-string handleRequest(ModuleNames...)(string request) {
+string handleRequest(ModuleNames...)(string request, Flag!"details" details = No.details) {
     const fail = `["fail"]`;
 
     try {
@@ -45,6 +50,11 @@ string handleRequest(ModuleNames...)(string request) {
         auto infoElem = Json.emptyObject;
         infoElem.id = func.id.to!string;
         infoElem.args = Json.emptyArray;
+
+        if(details) {
+            infoElem.regexp = func.regex;
+            infoElem.source = func.source;
+        }
 
         auto info = Json.emptyArray;
         info ~= infoElem;

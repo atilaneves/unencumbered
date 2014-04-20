@@ -25,7 +25,7 @@ void step3() {
 }
 
 private {
-    @Match!(r"Never going to see me")
+    @Match!(r"Never going to see me here")
     void privateStep() {
         reflectionFuncCalls ~= "privateStep";
     }
