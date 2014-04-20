@@ -6,7 +6,8 @@ module CucumberDMappings
   def run_feature
     write_src
     source_path = get_absolute_path("../source")
-    run("rdmd --force -I#{source_path} -I~/.dub/packages/unit-threaded-master /tmp/foo 2>&1")
+    pkg_dir = "~/.dub/packages"
+    run("rdmd --force -I#{source_path} -I#{pkg_dir}/unit-threaded-master/source -I#{pkg_dir}/vibe-d-master/source /tmp/foo 2>&1")
   end
 
   def write_passing_mapping(step_name)
@@ -135,11 +136,10 @@ module CucumberDMappings
 
   def add_src(code)
     @code ||= <<-EOF
-import cucumber;
+import cucumber.keywords;
+import cucumber.feature;
 import unit_threaded;
 import std.stdio;
-import std.conv;
-import std.traits;
 import std.math;
 EOF
     @code += code

@@ -1,6 +1,6 @@
 module tests.calculator.steps;
 
-import cucumber;
+import cucumber.keywords;
 import unit_threaded;
 import tests.calculator.impl;
 import std.conv;
