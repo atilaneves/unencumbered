@@ -13,13 +13,13 @@ public import std.typecons: Flag, Yes, No;
 alias DetailsFlag = Flag!"details";
 MatchResult[int] gMatches;
 
-void runCucumberServer(ModuleNames...)(ushort port, DetailsFlag details = No.details) {
+void runCucumberServer(ModuleNames...)(in ushort port, in DetailsFlag details = No.details) {
     debug writeln("Running the Cucumber server on port ", port, " details ", details);
     listenTCP(54321, (tcpConnection) { accept!ModuleNames(tcpConnection, details); });
 }
 
 
-private void accept(ModuleNames...)(TCPConnection tcpConnection, DetailsFlag details) {
+private void accept(ModuleNames...)(TCPConnection tcpConnection, in DetailsFlag details) {
     debug writeln("Accepting a connection");
     while(tcpConnection.connected) {
         auto bytes = tcpConnection.readLine(size_t.max, "\n");
@@ -34,61 +34,63 @@ private void send(TCPConnection tcpConnection, in string str) {
 }
 
 private void handleTcpRequest(ModuleNames...)(TCPConnection tcpConnection, in string request,
-                                              Flag!"details" details) {
+                                              in Flag!"details" details) {
     const reply = handleRequest!ModuleNames(request, details);
     debug writeln("Reply: ", reply);
     tcpConnection.send(reply);
 }
 
-string handleRequest(ModuleNames...)(string request, Flag!"details" details = No.details) {
+string handleRequest(ModuleNames...)(string request, in DetailsFlag details = No.details) {
     debug writeln("Request: ", request);
     const fail = `["fail"]`;
 
     try {
         const json = parseJson(request);
         const command = json[0].get!string;
-        if(command == "begin_scenario") return `["success"]`;
-        if(command == "end_scenario") return `["success"]`;
-        if(command != "step_matches" && command != "invoke") return fail;
-
-        if(command == "step_matches") {
-            const nameToMatch = json[1]["name_to_match"].get!string;
-            auto func = findMatch!ModuleNames(nameToMatch);
-            if(!func) return `["success",[]]`;
-            gMatches[func.id] = func;
-
-            auto infoElem = Json.emptyObject;
-            infoElem.id = func.id.to!string;
-            infoElem.args = Json.emptyArray;
-
-            if(details) {
-                infoElem.regexp = func.regex;
-                infoElem.source = func.source;
-            }
-
-            auto info = Json.emptyArray;
-            info ~= infoElem;
-
-            return `["success",` ~ info.toString ~ `]`;
-        } else if(command == "invoke") {
-            writeln("invoke");
-            const invokeArgs = json[1];
-            const id = invokeArgs.id.to!int;
-            if(id !in gMatches) throw new Exception(text("Could not find match for id ", id));
-            try {
-                gMatches[id]();
-            } catch(PendingException ex) {
-                return `["pending", "` ~ ex.msg ~ `"]`;
-            } catch(Throwable ex) {
-                return `["fail",{"message":"` ~ ex.msg ~ `", "exception": "` ~ ex.classinfo.name ~ `"}]`;
-            }
-            return `["success"]`;
-        }
+        if(command == "begin_scenario" || command == "end_scenario") return `["success"]`;
+        if(command == "step_matches") return handleStepMatches!ModuleNames(json, details);
+        else if(command == "invoke") return handleInvoke(json);
+        else return fail;
     } catch(Throwable ex) {
         stderr.writeln("Error processing request: ", request);
         stderr.writeln("Exception: ", ex.toString().sanitize());
         return fail;
     }
+}
 
-    return fail;
+private string handleStepMatches(ModuleNames...)(in Json json, in DetailsFlag details) {
+    const nameToMatch = json[1]["name_to_match"].get!string;
+    auto func = findMatch!ModuleNames(nameToMatch);
+    if(!func) return `["success",[]]`;
+    gMatches[func.id] = func;
+
+    auto infoElem = Json.emptyObject;
+    infoElem.id = func.id.to!string;
+    infoElem.args = Json.emptyArray;
+
+    if(details) {
+        infoElem.regexp = func.regex;
+        infoElem.source = func.source;
+    }
+
+    auto info = Json.emptyArray;
+    info ~= infoElem;
+
+    return `["success",` ~ info.toString ~ `]`;
+}
+
+
+private string handleInvoke(in Json json) {
+    writeln("invoke");
+    const invokeArgs = json[1];
+    const id = invokeArgs.id.to!int;
+    if(id !in gMatches) throw new Exception(text("Could not find match for id ", id));
+    try {
+        gMatches[id]();
+    } catch(PendingException ex) {
+        return `["pending", "` ~ ex.msg ~ `"]`;
+    } catch(Throwable ex) {
+        return `["fail",{"message":"` ~ ex.msg ~ `", "exception": "` ~ ex.classinfo.name ~ `"}]`;
+    }
+    return `["success"]`;
 }
