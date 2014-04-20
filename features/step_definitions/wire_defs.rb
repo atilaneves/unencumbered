@@ -111,7 +111,7 @@ def write_app_src(port, table)
   lines = <<-EOF
 module MyApp;
 
-import cucumber;
+import cucumber.server;
 import Some.Foreign;
 import vibe.d;
 import std.stdio;

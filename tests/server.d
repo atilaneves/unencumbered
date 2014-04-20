@@ -1,7 +1,7 @@
 module tests.server;
 
 import unit_threaded;
-import cucumber;
+import cucumber.server;
 import vibe.data.json;
 
 void testFail() {

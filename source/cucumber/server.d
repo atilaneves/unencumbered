@@ -1,5 +1,8 @@
 module cucumber.server;
 
+public import cucumber.keywords;
+public import cucumber.feature;
+
 import cucumber.reflection;
 import cucumber.feature: PendingException;
 import vibe.d;
