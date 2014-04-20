@@ -12,7 +12,7 @@ end
 
 def connect_to_server(port=54321)
   Dir.chdir("/tmp") do
-    `dub build`
+    `dub build --force`
     @server = IO.popen("./cucumber_test")
   end
   Timeout.timeout(5) do
@@ -119,10 +119,8 @@ import std.stdio;
 #{funcs}
 
 shared static this() {
-    debug {
-        setLogLevel(LogLevel.debugV);
-        writeln("Running the Cucumber server");
-    }
+    setLogLevel(LogLevel.debugV);
+    writeln("Running the Cucumber server");
 
     runCucumberServer!__MODULE__(#{port}#{details});
 }
