@@ -117,7 +117,7 @@ void testInvokePending() {
 }
 
 @SingleThreaded
-void testInvokeNormal() {
+void testInvokePass() {
     const matchesReply = jsonReply(`["step_matches",{"name_to_match":"we're wired"}]`);
     writelnUt("Reply: ", matchesReply);
 
@@ -132,6 +132,42 @@ void testInvokeNormal() {
     checkEqual(funcCalls, ["match1"]);
     checkEqual(invokeReply[0], "success");
     checkEqual(invokeReply.length, 1);
+
+    const endReply = jsonReply(`["end_scenario"]`);
+    checkEqual(endReply.toString(), `["success"]`);
+}
+
+class TestException: Exception {
+    this(string msg) {
+        super(msg);
+    }
+}
+
+@Given!`oops gonna fail`
+void gonnaFail() {
+    funcCalls ~= "gonna fail";
+    throw new TestException("I did it again");
+}
+
+@SingleThreaded
+void testInvokeFail() {
+    const matchesReply = jsonReply(`["step_matches",{"name_to_match":"oops gonna fail"}]`);
+    writelnUt("Reply: ", matchesReply);
+
+    const beginReply = jsonReply(`["begin_scenario"]`);
+    checkEqual(beginReply.toString(), `["success"]`);
+
+    funcCalls = [];
+    const id = matchesReply[1][0].id.to!string;
+    const invokeReply = jsonReply(`["invoke", {"id": "` ~ id ~ `", "args": []}]`);
+    writelnUt("Reply: ", invokeReply);
+
+    writelnUt("Start of the checks");
+    checkEqual(funcCalls, ["gonna fail"]);
+    checkEqual(invokeReply.length, 2);
+    checkEqual(invokeReply[0], "fail");
+    checkEqual(invokeReply[1].message.to!string, "I did it again");
+    checkEqual(invokeReply[1].exception.to!string, "tests.server.TestException");
 
     const endReply = jsonReply(`["end_scenario"]`);
     checkEqual(endReply.toString(), `["success"]`);

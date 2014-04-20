@@ -11,9 +11,7 @@ After do
 end
 
 def connect_to_server(port=54321)
-  #@server = IO.popen("./unencumbered")
   Dir.chdir("/tmp") do
-    #@server = IO.popen("dub run")
     `dub build`
     @server = IO.popen("./cucumber_test")
   end
@@ -62,9 +60,9 @@ end
 def get_funcs_string(responses, regexps)
   funcs = ""
   responses.each do |r|
-    if r.length > 1 && !r[1].empty? && !r[1][0].empty? && r[1][0].class == Hash && r[1][0].has_key?("source")
-      puts "lefoo!"
-      funcs += "\n" * 116 # to match the source line number
+    puts "r is #{r}"
+    if r.length > 1 && r[1].class == Array && !r[1].empty? && !r[1][0].empty? && r[1][0].class == Hash && r[1][0].has_key?("source")
+      funcs += "\n" * 115 # to match the source line number
     end
   end
   regexp = regexps.shift
@@ -78,8 +76,13 @@ def get_funcs_string(responses, regexps)
 
   funcs += "void MyClass() {\n"
   pending = responses.map { |r| r[0] == 'pending' ? r[1] : nil }.compact
-  puts "pending is #{pending}"
-  if not pending.empty? then funcs += "    pending(\"#{pending[0]}\");\n" end
+  failing = responses.map { |r| r[0] == 'fail' ? r[1]["message"] : nil }.compact
+  if not pending.empty?
+    funcs += "    pending(\"#{pending[0]}\");\n"
+  end
+  if not failing.empty?
+    funcs += "    throw new Some.Foreign.ExceptionType(\"#{failing[0]}\");\n"
+  end
   funcs += "}\n";
 
   funcs
@@ -109,6 +112,7 @@ def write_app_src(port, table)
 module MyApp;
 
 import cucumber;
+import Some.Foreign;
 import vibe.d;
 import std.stdio;
 
@@ -130,6 +134,19 @@ EOF
 
 end
 
+def write_exception
+  lines = <<-EOF
+module Some.Foreign;
+
+class ExceptionType: Exception {
+    this(string msg) {
+        super(msg);
+    }
+}
+EOF
+  write_file('/tmp/source/Some/Foreign.d', lines);
+end
+
 def copy_unencumbered
   FileUtils.cp_r(get_absolute_path("../source"), "/tmp/")
 end
@@ -140,5 +157,6 @@ Given(/^there is a wire server running on port (\d+) which understands the follo
   copy_unencumbered
   write_dub_json
   write_app_src(port, table)
+  write_exception
   connect_to_server(port)
 end

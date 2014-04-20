@@ -35,12 +35,12 @@ private void send(TCPConnection tcpConnection, in string str) {
 private void handle(ModuleNames...)(TCPConnection tcpConnection, in string request,
                                     Flag!"details" details = No.details) {
     const reply = handleRequest!ModuleNames(request, gDetailsFlag);
-    debug stderr.writeln("Reply: ", reply);
+    debug writeln("Reply: ", reply);
     tcpConnection.send(reply);
 }
 
 string handleRequest(ModuleNames...)(string request, Flag!"details" details = No.details) {
-    debug stderr.writeln("Request: ", request);
+    debug writeln("Request: ", request);
     const fail = `["fail"]`;
 
     try {
@@ -70,6 +70,7 @@ string handleRequest(ModuleNames...)(string request, Flag!"details" details = No
 
             return `["success",` ~ info.toString ~ `]`;
         } else if(command == "invoke") {
+            writeln("invoke");
             const invokeArgs = json[1];
             const id = invokeArgs.id.to!int;
             if(id !in gMatches) throw new Exception(text("Could not find match for id ", id));
@@ -77,6 +78,8 @@ string handleRequest(ModuleNames...)(string request, Flag!"details" details = No
                 gMatches[id]();
             } catch(PendingException ex) {
                 return `["pending", "` ~ ex.msg ~ `"]`;
+            } catch(Throwable ex) {
+                return `["fail",{"message":"` ~ ex.msg ~ `", "exception": "` ~ ex.classinfo.name ~ `"}]`;
             }
             return `["success"]`;
         }
