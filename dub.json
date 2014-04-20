@@ -5,12 +5,12 @@
     "homepage": "https://github.com/atilaneves/unencumbered",
     "authors": ["Atila Neves"],
     "license": "BSD 3-clause",
-    "targetType": "executable",
+    "targetType": "library",
     "dependencies": {
         "vibe-d": "~master"
     },
     "configurations": [
-        { "name": "executable",
+        { "name": "library",
           "versions": ["VibeDefaultMain"]
         },
         { "name": "unittest",
