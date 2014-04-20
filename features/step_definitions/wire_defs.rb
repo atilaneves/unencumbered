@@ -45,13 +45,10 @@ EOF
 end
 
 def get_regexps(requests, responses)
-  puts "responses are #{responses}"
   response_infos = responses.map { |r| r[1] }
   regexps = []
-  puts "responseinfos are #{response_infos}"
   response_infos.each do |response|
     response.each do |info|
-      puts "info is #{info}"
       if not info.keys.include?('regexp')
         return requests.map { |r| r[0] == "step_matches" ? r[1]["name_to_match"] : ""}
       end
@@ -67,6 +64,8 @@ def get_funcs_string(responses, regexps)
   idx = 1
   responses.each do |response|
     regexp = regexps.shift
+    if response.length < 2 then next end
+    if response[0] != "success" then next end
     if response[1].length > 0
       funcs += "@Match!r\"#{regexp}\"\n"
     else
@@ -80,8 +79,10 @@ def get_funcs_string(responses, regexps)
 end
 
 def get_details_string(responses)
-  responses.map { |r| r[1] }.each do |response|
-    response.each do |info|
+  responses.each do |response|
+    if response.length < 2 then next end
+    if response[0] != "success" then next end
+    response[1].each do |info|
       if info.keys.include? "source"
         return ", Yes.details"
       end
