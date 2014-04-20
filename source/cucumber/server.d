@@ -47,10 +47,13 @@ string handleRequest(ModuleNames...)(string request, in DetailsFlag details = No
     try {
         const json = parseJson(request);
         const command = json[0].get!string;
-        if(command == "begin_scenario" || command == "end_scenario") return `["success"]`;
-        if(command == "step_matches") return handleStepMatches!ModuleNames(json, details);
-        else if(command == "invoke") return handleInvoke(json);
-        else return fail;
+        switch(command) {
+        case "begin_scenario": return `["success"]`;
+        case "end_scenario": return `["success"]`;
+        case "step_matches": return handleStepMatches!ModuleNames(json, details);
+        case "invoke": return handleInvoke(json);
+        default: return fail;
+        }
     } catch(Throwable ex) {
         stderr.writeln("Error processing request: ", request);
         stderr.writeln("Exception: ", ex.toString().sanitize());
