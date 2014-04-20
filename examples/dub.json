@@ -1,10 +1,12 @@
 {
-    "name": "foo",
+    "name": "calculator_example",
     "targetType": "executable",
     "dependencies": {
         "vibe-d": "~master",
         "unit-threaded": "~master",
-        "unencumbered": "~master"
+        "unencumbered": "~master",
     },
-    "versions": ["VibeDefaultMain"]
+    "versions": ["VibeDefaultMain"],
+    "importPaths": ["../"],
+    "sourcePaths": ["../tests/calculator", "source"]
 }

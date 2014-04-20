@@ -6,5 +6,5 @@ shared static this() {
     setLogLevel(LogLevel.debugV);
     writeln("Running the Example Cucumber server");
 
-    runCucumberServer!"calculator_steps"(54321, Yes.details);
+    runCucumberServer!"tests.calculator.steps"(54321, Yes.details);
 }
