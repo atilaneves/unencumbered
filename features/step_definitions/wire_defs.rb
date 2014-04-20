@@ -60,21 +60,28 @@ end
 
 
 def get_funcs_string(responses, regexps)
-  funcs = "\n" * 115 # to get the line numbers to match
-  idx = 1
-  responses.each do |response|
-    regexp = regexps.shift
-    if response.length < 2 then next end
-    if response[0] != "success" then next end
-    if response[1].length > 0
-      funcs += "@Match!r\"#{regexp}\"\n"
-    else
-      funcs += "@Match!r\"falkacpioiwervl\"\n"
+  funcs = ""
+  responses.each do |r|
+    if r.length > 1 && !r[1].empty? && !r[1][0].empty? && r[1][0].class == Hash && r[1][0].has_key?("source")
+      puts "lefoo!"
+      funcs += "\n" * 116 # to match the source line number
     end
-
-    funcs += "void MyClass() { }\n"
-    idx += 1
   end
+  regexp = regexps.shift
+  response = responses[0]
+
+  if response[1].length > 0
+    funcs += "@Given!r\"#{regexp}\"\n"
+  else
+    funcs += "@Given!r\"falkacpioiwervl\"\n"
+  end
+
+  funcs += "void MyClass() {\n"
+  pending = responses.map { |r| r[0] == 'pending' ? r[1] : nil }.compact
+  puts "pending is #{pending}"
+  if not pending.empty? then funcs += "    pending(\"#{pending[0]}\");\n" end
+  funcs += "}\n";
+
   funcs
 end
 
@@ -101,8 +108,7 @@ def write_app_src(port, table)
   lines = <<-EOF
 module MyApp;
 
-import cucumber.server;
-import cucumber.keywords;
+import cucumber;
 import vibe.d;
 import std.stdio;
 

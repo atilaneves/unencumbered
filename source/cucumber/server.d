@@ -47,6 +47,7 @@ string handleRequest(ModuleNames...)(string request, Flag!"details" details = No
         const json = parseJson(request);
         const command = json[0].get!string;
         if(command == "begin_scenario") return `["success"]`;
+        if(command == "end_scenario") return `["success"]`;
         if(command != "step_matches" && command != "invoke") return fail;
 
         if(command == "step_matches") {

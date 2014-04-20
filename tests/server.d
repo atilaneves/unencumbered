@@ -132,4 +132,7 @@ void testInvokeNormal() {
     checkEqual(funcCalls, ["match1"]);
     checkEqual(invokeReply[0], "success");
     checkEqual(invokeReply.length, 1);
+
+    const endReply = jsonReply(`["end_scenario"]`);
+    checkEqual(endReply.toString(), `["success"]`);
 }
