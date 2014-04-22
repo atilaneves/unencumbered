@@ -1,4 +1,4 @@
-unencumbered
+Unencumbered
 ============
 [![Build Status](https://travis-ci.org/atilaneves/unencumbered.png?branch=master)](https://travis-ci.org/atilaneves/unencumbered)
 
