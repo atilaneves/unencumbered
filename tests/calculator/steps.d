@@ -20,25 +20,25 @@ void calculatorComputesPi() {
 
 @Then!(r"^the calculator returns PI$")
 void calculatorReturns() {
-    writeln("returns pi");
+    debug writeln("returns pi");
     checkTrue(closeEnough(calculator.result, PI));
 }
 
 @When!(`^the calculator adds up "?([0-9.]+)"? and "?([0-9.]+)"?$`)
 void whenAddsUp(in double a, in double b) {
-    writeln("adding ", a, " to ", b);
+    debug writeln("adding ", a, " to ", b);
     calculator.add(a, b);
 }
 
 @And!(r"^the calculator adds up ([0-9.]+) and ([0-9.]+)$")
 void andAddsUp(in double a, in double b) {
-    writeln("andAddsUp adding up ", a, " to ", b);
+    debug writeln("andAddsUp adding up ", a, " to ", b);
     calculator.add(a, b);
 }
 
 @When!(`the calculator adds up "([0-9.]+)", "([0-9.]+)" and "([0-9.]+)"`)
 void whenAdds3(in double a, in double b, in double c) {
-    writeln("whenAdds3 adding up ", a, ", ", b, " to ", c);
+    debug writeln("whenAdds3 adding up ", a, ", ", b, " to ", c);
     calculator.add(a, b, c);
 }
 
@@ -49,6 +49,6 @@ void butDoesNot() {
 
 @Then!(`^the calculator returns "(.+)"`)
 void thenReturnsPi(in string a) {
-    writeln("returns capture");
+    debug writeln("returns capture");
     checkTrue(closeEnough(calculator.result, a.to!double));
 }

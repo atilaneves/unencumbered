@@ -83,8 +83,8 @@ private string handleStepMatches(ModuleNames...)(in Json json, in DetailsFlag de
 }
 
 
-private string handleInvoke(in Json json) {
-    writeln("invoke");
+private string handleInvoke (in Json json) {
+    debug writeln("handleInvoke for json ", json);
     const invokeArgs = json[1];
     const id = invokeArgs.id.to!int;
     if(id !in gMatches) throw new Exception(text("Could not find match for id ", id));

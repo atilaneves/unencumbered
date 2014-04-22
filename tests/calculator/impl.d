@@ -7,7 +7,7 @@ struct Calculator {
     double result;
 
     void add(T...)(T args) {
-        writeln("Adding args ", args);
+        debug writeln("Adding args ", args);
         result = 0;
         foreach(a; args) result += a;
     }

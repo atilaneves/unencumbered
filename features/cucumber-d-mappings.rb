@@ -168,7 +168,7 @@ EOF
         add_src <<-EOF
 int main() {
     const results = runFeature!__MODULE__(#{read_steps});
-    writeln(results.toString());
+    debug writeln(results.toString());
     return results.numFailing ? 1 : 0;
 }
 EOF

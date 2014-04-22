@@ -41,7 +41,7 @@ auto runFeature(Modules...)(string[] input) {
         auto func = findMatch!Modules(line);
         if(!func) {
             import std.stdio;
-            writeln("Could not find match for ", line);
+            stderr.writeln("Could not find match for ", line);
         }
         if(!func) return FeatureResults(1, 0, 0, 0, 1);
 
@@ -51,7 +51,7 @@ auto runFeature(Modules...)(string[] input) {
             return FeatureResults(1, 0, 0, 1);
         } catch(Throwable e) {
             import std.stdio;
-            writeln("Exception: ", e.msg.sanitize);
+            stderr.writeln("Exception: ", e.msg.sanitize);
             return FeatureResults(1, 0, 1, 0);
         }
     }
