@@ -8,7 +8,7 @@ to support step definitions written in [D](http://dlang.org/).
 This is done by implementing the Cucumber
 [wire protocol](https://github.com/cucumber/cucumber/wiki/Wire-Protocol).
 The best way to get a feel for how it's used is to look at the
-[calculator example](examples/app.d). To run it,type `dub run` in the
+[calculator example](examples/source/app.d). To run it,type `dub run` in the
 [examples](examples) directory and `cucumber` from the same directory in another shell.
 
 Unencumbered works by using compile-time reflection to find all the
