@@ -11,5 +11,5 @@ install:
  - ./build.sh
  - cd ..
 script:
- - dub/dub test
+ - dub/bin/dub test
  - cucumber --tags ~@wip features/wire_protocol.feature
