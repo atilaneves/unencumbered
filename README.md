@@ -29,3 +29,10 @@ is registered, the code will not compile (try it and see!).
 If the regular expression is invalid (e.g. because a capturing parenthesis
 is never closed), a compile-time (CTFE) exception is thrown, so the code
 won't compile in that case either.
+
+Step definitions are supposed to test the code and signal failure by
+throwing any `Throwable`. The examples use the check functions from
+[unit-threaded](https://github.com/atilaneves/unit-threaded), but regular
+`assert` or anything else that throws on failure would work too.
+Unencumbered actually reports the exception type and message
+back to Cucumber over the wire protocol.
