@@ -8,51 +8,49 @@ import std.regex;
 import std.conv;
 
 
-private enum isMatchStruct(T) = is(T:Match!(S, N), string S, ulong N);
-
-unittest {
-    static assert(isMatchStruct!(Match!""));
+private template isMatchStruct(alias T) {
+    static if(__traits(compiles, typeof(T))) {
+        enum isMatchStruct = is(typeof(T): Match);
+    } else {
+        enum isMatchStruct = false;
+    }
 }
 
-private enum hasMatchUDA(alias T) = Filter!(isMatchStruct, __traits(getAttributes, T)).length > 0;
-
-private template matchToRegex(T: Match!S, string S) if(isMatchStruct!T) {
-    enum matchToRegex = S;
+unittest {
+    Match match;
+    static assert(isMatchStruct!match);
 }
 
-enum getRegex(alias T) = matchToRegex!(Filter!(isMatchStruct, __traits(getAttributes, T))[0]);
+
+private template hasMatchUDA(alias T) {
+    alias attrs = Filter!(isMatchStruct, __traits(getAttributes, T));
+    static assert(attrs.length < 2, "Only one Match UDA per function");
+    enum hasMatchUDA = attrs.length == 1;
+}
+
+private auto getRegex(alias T)() {
+    static assert(hasMatchUDA!T, "Can only get regexp from Match structure");
+    return Filter!(isMatchStruct, __traits(getAttributes, T))[0].reg;
+}
 
 unittest {
-    @Match!(r"^foo reg")
+    @Match(`^foo reg`)
     void foo() {
-        static assert(hasMatchUDA!(foo));
-        static assert(matchToRegex!(Match!"my regex") == "my regex");
-        static assert(getRegex!(foo) == "^foo reg");
-    }
-
-    void bar() {
-        static assert(!hasMatchUDA!(bar));
+        static assert(hasMatchUDA!foo);
+        static assert(getRegex!foo == `^foo reg`);
     }
 }
 
-
-private template matchToLineNumber(T: Match!(S, N), string S, ulong N) if(isMatchStruct!T) {
-    enum matchToLineNumber = N;
+auto getLineNumber(alias T)() {
+    static assert(hasMatchUDA!T, "Can only get line number from Match structure");
+    return Filter!(isMatchStruct, __traits(getAttributes, T))[0].line;
 }
 
 unittest {
-    static assert(matchToLineNumber!(Match!("foo", 3UL)) == 3);
-    static assert(matchToLineNumber!(Match!("bar", 87UL)) == 87);
-}
-
-enum getLineNumber(alias T) = matchToLineNumber!(Filter!(isMatchStruct, __traits(getAttributes, T))[0]);
-
-unittest {
-    @Match!("foo", 4)
-    void foo() {}
+    @Match("foo", 4) void foo() {}
     static assert(getLineNumber!foo == 4);
-    @Match!("bar", 3)
-    void bar() {}
+
+    @Match("bar", 3) void bar() {}
     static assert(getLineNumber!bar == 3);
 }
 

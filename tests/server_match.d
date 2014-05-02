@@ -9,7 +9,7 @@ void testNoMatches() {
     checkEqual(findMatch!__MODULE__("foobarbaz"), MatchResult.init);
 }
 
-@Match!`^we are wired$`
+@Match(`^we are wired$`)
 void wereWired() {
 }
 
@@ -26,7 +26,7 @@ void testOneMatch() {
 
 private int result;
 
-@Match!`I add (\d+) and (\d+)`
+@Match(`I add (\d+) and (\d+)`)
 void addTwo(int a, int b) {
     result = a + b;
 }

@@ -150,7 +150,7 @@ EOF
     @num_steps += 1
     add_src <<-EOF
 
-@Match!(r\"#{step_name}\")
+@Match(r\"#{step_name}\")
 void testFunc_#{@num_steps}() {
     #{code}
 }
@@ -168,7 +168,7 @@ EOF
         add_src <<-EOF
 int main() {
     const results = runFeature!__MODULE__(#{read_steps});
-    debug writeln(results.toString());
+    writeln(results.toString());
     return results.numFailing ? 1 : 0;
 }
 EOF

@@ -6,29 +6,29 @@ import cucumber.feature;
 
 package string[] matchFuncCalls;
 
-@Match!(r"^I match a passing step$")
+@Match(r"^I match a passing step$")
 void passingStep1() {
     matchFuncCalls ~= "passingStep1";
 }
 
-@Match!(r"^I also match a passing step$")
+@Match(r"^I also match a passing step$")
 void passingStep2() {
     matchFuncCalls ~= "passingStep2";
 }
 
-@Match!(r"^What about me. I also pass$")
+@Match(r"^What about me. I also pass$")
 void passingStep3() {
     matchFuncCalls ~= "passingStep3";
 }
 
-@Match!(r"I match a failing step$")
+@Match(r"I match a failing step$")
 void failingStep() {
     matchFuncCalls ~= "failingStep";
     throw new Exception("Exception: step failed");
 }
 
 private {
-    @Match!(r"Never going to see me")
+    @Match(r"Never going to see me")
     void privateStep();
 }
 
@@ -84,7 +84,7 @@ void testUndefinedWithWrongString() {
 }
 
 
-@Match!(r"Gotta match pending")
+@Match(r"Gotta match pending")
 void pendingStep() {
     pending();
 }

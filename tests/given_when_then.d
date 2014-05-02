@@ -6,22 +6,22 @@ import cucumber.feature;
 
 private string[] funcCalls;
 
-@Given!(r"^A situation$")
+@Given(r"^A situation$")
 void given() {
     funcCalls ~= "Given";
 }
 
-@When!(r"^I do this")
+@When(r"^I do this")
 void when() {
     funcCalls ~= "When";
 }
 
-@Then!(r"^This happens")
+@Then(r"^This happens")
 void then() {
     funcCalls ~= "Then";
 }
 
-@When!(r"I do a failing step$")
+@When(r"I do a failing step$")
 void failingStep() {
     funcCalls ~= "failingStep";
     throw new Exception("Exception: step failed");

@@ -15,17 +15,17 @@ void testNoMatches() {
 
 private string[] funcCalls;
 
-@Match!`^we're wired$`
+@Match(`^we're wired$`)
 void match1() {
     funcCalls ~= "match1";
 }
 
-@Match!`^2nd match$`
+@Match(`^2nd match$`)
 void match2() {
     funcCalls ~= "match2";
 }
 
-@Match!`^\drd .+`
+@Match(`^\drd .+`)
 void match3() {
     funcCalls ~= "match3";
 }
@@ -75,13 +75,13 @@ private auto jsonReply(string request) {
     return parseJson(reply);
 }
 
-@Match!`das pending1`
+@Match(`das pending1`)
 void pendingFunc1() {
     funcCalls ~= "pending1";
     pending("I'll do it later");
 }
 
-@Match!`das pending2`
+@Match(`das pending2`)
 void pendingFunc2() {
     funcCalls ~= "pending2";
     pending("But I'm le tired");
@@ -143,7 +143,7 @@ class TestException: Exception {
     }
 }
 
-@Given!`oops gonna fail`
+@Given(`oops gonna fail`)
 void gonnaFail() {
     funcCalls ~= "gonna fail";
     throw new TestException("I did it again");

@@ -9,23 +9,23 @@ import std.array;
 
 private string[] reflectionFuncCalls;
 
-@Match!(r"^I match step1")
+@Match(r"^I match step1")
 void step1() {
     reflectionFuncCalls ~= "step1";
 }
 
-@Match!(r"^I think I match step2")
+@Match(r"^I think I match step2")
 void step2() {
     reflectionFuncCalls ~= "step2";
 }
 
-@Match!(r"^Ooh, step3$")
+@Match(r"^Ooh, step3$")
 void step3() {
     reflectionFuncCalls ~= "step3";
 }
 
 private {
-    @Match!(r"Never going to see me here")
+    @Match(r"Never going to see me here")
     void privateStep() {
         reflectionFuncCalls ~= "privateStep";
     }

@@ -69,9 +69,9 @@ def get_funcs_string(responses, regexps)
   response = responses[0]
 
   if response[1].length > 0
-    funcs += "@Given!r\"#{regexp}\"\n"
+    funcs += "@Given(r\"#{regexp}\")\n"
   else
-    funcs += "@Given!r\"falkacpioiwervl\"\n"
+    funcs += "@Given(r\"falkacpioiwervl\")\n"
   end
 
   funcs += "void MyClass() {\n"

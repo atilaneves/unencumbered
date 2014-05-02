@@ -2,7 +2,15 @@ module cucumber.keywords;
 
 import std.string;
 
-struct Match(string reg, ulong line = __LINE__) { }
+struct Match {
+    string reg;
+    ulong line;
+    this(in string reg, in ulong line = __LINE__) {
+        this.reg = reg;
+        this.line = line;
+    }
+}
+
 alias Given = Match;
 alias When = Match;
 alias Then = Match;
