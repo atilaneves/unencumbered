@@ -4,3 +4,4 @@ tmp
 foo
 foo\.o
 examples/calculator_example
+libunencumbered.a
