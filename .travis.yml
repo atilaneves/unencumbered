@@ -7,4 +7,5 @@ install:
  - sudo apt-get -y install dmd-bin libcurl4-gnutls-dev dub
  - gem install cucumber rspec aruba
 script:
+ - dub test
  - cucumber --tags ~@wip features/wire_protocol.feature
