@@ -5,3 +5,4 @@ foo
 foo\.o
 examples/calculator_example
 libunencumbered.a
+dub.selections.json
