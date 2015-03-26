@@ -85,7 +85,7 @@ struct CucumberStep {
  */
 auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleNames)))) {
     mixin(importModulesString!ModuleNames);
-    CucumberStep cucumberSteps[];
+    CucumberStep[] cucumberSteps;
     int id;
     foreach(mod; ModuleNames) {
         foreach(member; __traits(allMembers, mixin(mod))) {
@@ -137,7 +137,7 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
  */
 struct MatchResult {
     CucumberStepFunction func;
-    const string[] captures;
+    const (string)[] captures;
     int id;
     string regex;
     string source;
@@ -165,7 +165,7 @@ struct MatchResult {
  * over to see which one has a matching regex. Steps are found
  * at compile-time.
  */
-auto findMatch(ModuleNames...)(string step_str) {
+MatchResult findMatch(ModuleNames...)(string step_str) {
     step_str = stripCucumberKeywords(step_str);
     enum steps = findSteps!ModuleNames;
     foreach(step; steps) {
