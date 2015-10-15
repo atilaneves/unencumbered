@@ -1,5 +1,8 @@
 language: d
 sudo: false
+install:
+  gem install cucumber
+  gem install aruba
 script:
  - dub test
  - cucumber --tags ~@wip features/wire_protocol.feature
