@@ -1,8 +1,8 @@
 language: d
 sudo: false
 install:
-  gem install bundler
-  bundle install
+ - gem install bundler
+ - bundle install
 script:
  - dub test
  - cucumber --tags ~@wip features/wire_protocol.feature
