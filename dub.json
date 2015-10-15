@@ -18,7 +18,7 @@
           "sourcePaths": ["tests"],
           "mainSourceFile": "tests/ut.d",
           "dependencies": {
-              "unit-threaded": "~master"
+              "unit-threaded": "~>0.4.10"
           },
           "excludedSourceFiles": ["source/cucumber/app.d"],
           "versions": ["VibeCustomMain"]

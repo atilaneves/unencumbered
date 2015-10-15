@@ -4,6 +4,7 @@ import unit_threaded;
 import cucumber.server;
 import vibe.data.json;
 
+
 void testFail() {
     checkEqual(handleRequest!__MODULE__("fsafs"), `["fail"]`);
     checkEqual(handleRequest!__MODULE__(`["foo"]`), `["fail"]`);
@@ -30,14 +31,31 @@ void match3() {
     funcCalls ~= "match3";
 }
 
+void checkSuccessJson(string str, in string id, in string[] args) {
+    import std.algorithm;
+    auto json = parseJson(str);
+    checkEqual(json[0], "success");
+    auto obj = json[1][0];
+    checkEqual(obj["id"], id);
+    string[] objArgs;
+    foreach(arg; obj["args"])
+        objArgs ~= arg.toString;
+    checkEqual(objArgs, args);
+}
+
 @SingleThreaded
 void testMatchesNoDetails() {
-    checkEqual(handleRequest!__MODULE__(`["step_matches",{"name_to_match":"we're wired"}]`),
-               `["success",[{"id":"1","args":[]}]]`);
-    checkEqual(handleRequest!__MODULE__(`["step_matches",{"name_to_match":"2nd match"}]`),
-               `["success",[{"id":"2","args":[]}]]`);
-    checkEqual(handleRequest!__MODULE__(`["step_matches",{"name_to_match":"3rd match"}]`),
-               `["success",[{"id":"3","args":[]}]]`);
+    checkSuccessJson(handleRequest!__MODULE__(`["step_matches",{"name_to_match":"we're wired"}]`),
+                     "1", []);
+    checkSuccessJson(handleRequest!__MODULE__(`["step_matches",{"name_to_match":"we're wired"}]`),
+                     "1", []);
+    checkSuccessJson(handleRequest!__MODULE__(`["step_matches",{"name_to_match":"we're wired"}]`),
+                     "1", []);
+    checkSuccessJson(handleRequest!__MODULE__(`["step_matches",{"name_to_match":"2nd match"}]`),
+                     "2", []);
+    checkSuccessJson(handleRequest!__MODULE__(`["step_matches",{"name_to_match":"3rd match"}]`),
+                     "3", []);
+
 }
 
 @SingleThreaded
@@ -52,7 +70,7 @@ void testMatchesDetails() {
 
         checkEqual(json[1][0].id.to!int, 1);
         checkEqual(json[1][0].args.length.to!int, 0);
-        checkEqual(json[1][0].source.to!string, "tests.server.match1:18");
+        checkEqual(json[1][0].source.to!string, "tests.server.match1:19");
         checkEqual(json[1][0].regexp.to!string, "^we're wired$");
     }
     {
@@ -65,7 +83,7 @@ void testMatchesDetails() {
 
         checkEqual(json[1][0].id.to!int, 2);
         checkEqual(json[1][0].args.length.to!int, 0);
-        checkEqual(json[1][0].source.to!string, "tests.server.match2:23");
+        checkEqual(json[1][0].source.to!string, "tests.server.match2:24");
         checkEqual(json[1][0].regexp.to!string, "^2nd match$");
     }
 }
