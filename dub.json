@@ -7,7 +7,7 @@
     "license": "BSD 3-clause",
     "targetType": "library",
     "dependencies": {
-        "vibe-d": "~master"
+        "vibe-d": "~>0.7.25"
     },
     "configurations": [
         { "name": "library",

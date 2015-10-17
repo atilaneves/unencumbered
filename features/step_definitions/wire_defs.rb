@@ -39,7 +39,12 @@ def write_dub_json
 }
 EOF
 
-  write_file("/tmp/dub.json", dub)
+    _write_file("/tmp/dub.json", dub)
+end
+
+def _write_file(filename, str)
+  Dir.exist?(File.dirname(filename)) or Dir.mkdir(File.dirname(filename))
+  File.open(filename, 'w') { |file| file.write(str)}
 end
 
 def get_regexps(requests, responses)
@@ -127,7 +132,7 @@ shared static this() {
 
 EOF
   filename = '/tmp/source/MyApp.d'
-  write_file(filename, lines)
+  _write_file(filename, lines)
   puts "#{filename}:\n#{lines}"
 
 end
@@ -142,7 +147,7 @@ class ExceptionType: Exception {
     }
 }
 EOF
-  write_file('/tmp/source/Some/Foreign.d', lines);
+  _write_file('/tmp/source/Some/Foreign.d', lines);
 end
 
 def copy_unencumbered
