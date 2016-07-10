@@ -37,17 +37,17 @@ void testFindMySteps() {
     auto steps = findSteps!__MODULE__;
     auto regexen = [r"^I match step1", r"^I think I match step2", r"^Ooh, step3$"];
 
-    checkEqual(steps.map!(a => a.regex).array,
+    shouldEqual(steps.map!(a => a.regex).array,
                regexen.map!(a => std.regex.regex(a)).array);
 
     steps[0].func();
-    checkEqual(reflectionFuncCalls, ["step1"]);
+    shouldEqual(reflectionFuncCalls, ["step1"]);
 
     steps[1].func();
-    checkEqual(reflectionFuncCalls, ["step1", "step2"]);
+    shouldEqual(reflectionFuncCalls, ["step1", "step2"]);
 
     steps[2].func();
-    checkEqual(reflectionFuncCalls, ["step1", "step2", "step3"]);
+    shouldEqual(reflectionFuncCalls, ["step1", "step2", "step3"]);
 }
 
 void testFindMatchSteps() {
@@ -61,36 +61,36 @@ void testFindMatchSteps() {
                     r"I match a failing step$",
                     r"Gotta match pending"];
 
-    checkEqual(steps.map!(a => a.regex).array,
+    shouldEqual(steps.map!(a => a.regex).array,
                regexen.map!(a => std.regex.regex(a)).array);
 
     steps[0].func();
-    checkEqual(matchFuncCalls, ["passingStep1"]);
+    shouldEqual(matchFuncCalls, ["passingStep1"]);
 
     steps[1].func();
-    checkEqual(matchFuncCalls, ["passingStep1", "passingStep2"]);
+    shouldEqual(matchFuncCalls, ["passingStep1", "passingStep2"]);
 
     steps[2].func();
-    checkEqual(matchFuncCalls, ["passingStep1", "passingStep2", "passingStep3"]);
+    shouldEqual(matchFuncCalls, ["passingStep1", "passingStep2", "passingStep3"]);
 
-    checkThrown!Exception(steps[3].func());
-    checkEqual(matchFuncCalls, ["passingStep1", "passingStep2", "passingStep3", "failingStep"]);
+    shouldThrow!Exception(steps[3].func());
+    shouldEqual(matchFuncCalls, ["passingStep1", "passingStep2", "passingStep3", "failingStep"]);
 }
 
 void testFindMatch() {
     reflectionFuncCalls = [];
 
     findMatch!__MODULE__("I match step1")();
-    checkEqual(reflectionFuncCalls, ["step1"]);
+    shouldEqual(reflectionFuncCalls, ["step1"]);
 
     findMatch!__MODULE__("I think I match step2......")(); //extra chars, still matches
-    checkEqual(reflectionFuncCalls, ["step1", "step2"]);
+    shouldEqual(reflectionFuncCalls, ["step1", "step2"]);
     findMatch!__MODULE__("Ooh, step3")();
-    checkEqual(reflectionFuncCalls, ["step1", "step2", "step3"]);
+    shouldEqual(reflectionFuncCalls, ["step1", "step2", "step3"]);
 
-    checkFalse(findMatch!__MODULE__("Ooh, step3."));
-    checkThrown!Exception(findMatch!__MODULE__("Ooh, step3.")());
+    shouldBeFalse(cast(bool)findMatch!__MODULE__("Ooh, step3."));
+    shouldThrow!Exception(findMatch!__MODULE__("Ooh, step3.")());
 
-    checkFalse(findMatch!__MODULE__("random garbage"));
-    checkThrown!Exception(findMatch!__MODULE__("random garbage")());
+    shouldBeFalse(cast(bool)findMatch!__MODULE__("random garbage"));
+    shouldThrow!Exception(findMatch!__MODULE__("random garbage")());
 }

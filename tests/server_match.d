@@ -6,7 +6,7 @@ import unit_threaded;
 
 
 void testNoMatches() {
-    checkEqual(findMatch!__MODULE__("foobarbaz"), MatchResult.init);
+    shouldEqual(findMatch!__MODULE__("foobarbaz"), MatchResult.init);
 }
 
 @Match(`^we are wired$`)
@@ -14,14 +14,14 @@ void wereWired() {
 }
 
 private void checkNumCaptures(in string[] captures, int num) {
-    checkEqual(captures.length, num + 1); //+1 because idx 0 is the whole thing
+    shouldEqual(captures.length, num + 1); //+1 because idx 0 is the whole thing
 }
 
 void testOneMatch() {
     auto match = findMatch!__MODULE__("we are wired");
-    checkTrue(match);
+    shouldBeTrue(cast(bool)match);
     checkNumCaptures(match.captures, 0);
-    checkEqual(match.id, 1); //1st one in the file
+    shouldEqual(match.id, 1); //1st one in the file
 }
 
 private int result;
@@ -36,8 +36,8 @@ void testAddTwo() {
     const func = findMatch!__MODULE__(step_str);
     result = 0;
     func();
-    checkEqual(result, 8);
-    checkEqual(func.captures, [step_str, "3", "5"]);
-    checkEqual(func.id, 2);
-    checkEqual(func.regex, `I add (\d+) and (\d+)`);
+    shouldEqual(result, 8);
+    shouldEqual(func.captures, [step_str, "3", "5"]);
+    shouldEqual(func.id, 2);
+    shouldEqual(func.regex, `I add (\d+) and (\d+)`);
 }

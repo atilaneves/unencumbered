@@ -6,12 +6,13 @@ import vibe.data.json;
 
 
 void testFail() {
-    checkEqual(handleRequest!__MODULE__("fsafs"), `["fail"]`);
-    checkEqual(handleRequest!__MODULE__(`["foo"]`), `["fail"]`);
+    //handleRequest!__MODULE__("fsafs").shouldThrow!JSONException;
+    shouldEqual(handleRequest!__MODULE__(`["fsafs"]`), `["fail"]`);
+    shouldEqual(handleRequest!__MODULE__(`["foo"]`), `["fail"]`);
 }
 
 void testNoMatches() {
-    checkEqual(handleRequest!__MODULE__(`["step_matches",{"name_to_match":"foo"}]`), `["success",[]]`);
+    shouldEqual(handleRequest!__MODULE__(`["step_matches",{"name_to_match":"foo"}]`), `["success",[]]`);
 }
 
 private string[] funcCalls;
@@ -34,13 +35,13 @@ void match3() {
 void checkSuccessJson(string str, in string id, in string[] args) {
     import std.algorithm;
     auto json = parseJson(str);
-    checkEqual(json[0], "success");
+    shouldEqual(json[0], "success");
     auto obj = json[1][0];
-    checkEqual(obj["id"], id);
+    shouldEqual(obj["id"], id);
     string[] objArgs;
     foreach(arg; obj["args"])
         objArgs ~= arg.toString;
-    checkEqual(objArgs, args);
+    shouldEqual(objArgs, args);
 }
 
 @SingleThreaded
@@ -65,26 +66,26 @@ void testMatchesDetails() {
         const json = parseJson(reply); //reply can't be const
         writelnUt("json is ", json);
 
-        checkEqual(json[0].get!string, "success");
-        checkEqual(json[1].length, 1);
+        shouldEqual(json[0].get!string, "success");
+        shouldEqual(json[1].length, 1);
 
-        checkEqual(json[1][0].id.to!int, 1);
-        checkEqual(json[1][0].args.length.to!int, 0);
-        checkEqual(json[1][0].source.to!string, "tests.server.match1:19");
-        checkEqual(json[1][0].regexp.to!string, "^we're wired$");
+        shouldEqual(json[1][0]["id"].to!int, 1);
+        shouldEqual(json[1][0]["args"].length.to!int, 0);
+        shouldEqual(json[1][0]["source"].to!string, "tests.server.match1:19");
+        shouldEqual(json[1][0]["regexp"].to!string, "^we're wired$");
     }
     {
         auto reply = handleRequest!__MODULE__(`["step_matches",{"name_to_match":"2nd match"}]`, Yes.details);
         const json = parseJson(reply); //reply can't be const
         writelnUt("json is ", json);
 
-        checkEqual(json[0].get!string, "success");
-        checkEqual(json[1].length, 1);
+        shouldEqual(json[0].get!string, "success");
+        shouldEqual(json[1].length, 1);
 
-        checkEqual(json[1][0].id.to!int, 2);
-        checkEqual(json[1][0].args.length.to!int, 0);
-        checkEqual(json[1][0].source.to!string, "tests.server.match2:24");
-        checkEqual(json[1][0].regexp.to!string, "^2nd match$");
+        shouldEqual(json[1][0]["id"].to!int, 2);
+        shouldEqual(json[1][0]["args"].length.to!int, 0);
+        shouldEqual(json[1][0]["source"].to!string, "tests.server.match2:24");
+        shouldEqual(json[1][0]["regexp"].to!string, "^2nd match$");
     }
 }
 
@@ -110,27 +111,27 @@ void pendingFunc2() {
 void testInvokePending() {
     {
         const matchesReply = jsonReply(`["step_matches",{"name_to_match":"das pending1"}]`);
-        const id = matchesReply[1][0].id.to!string;
+        const id = matchesReply[1][0]["id"].to!string;
         const beginReply = jsonReply(`["begin_scenario"]`);
-        checkEqual(beginReply.toString(), `["success"]`);
+        shouldEqual(beginReply.toString(), `["success"]`);
 
         funcCalls = [];
         const invokeReply = jsonReply(`["invoke", {"id": "` ~ id ~ `", "args": []}]`);
-        checkEqual(funcCalls, ["pending1"]);
-        checkEqual(invokeReply[0], "pending");
-        checkEqual(invokeReply[1], "I'll do it later");
+        shouldEqual(funcCalls, ["pending1"]);
+        shouldEqual(invokeReply[0], "pending");
+        shouldEqual(invokeReply[1], "I'll do it later");
     }
     {
         const matchesReply = jsonReply(`["step_matches",{"name_to_match":"das pending2"}]`);
-        const id = matchesReply[1][0].id.to!string;
+        const id = matchesReply[1][0]["id"].to!string;
         const beginReply = jsonReply(`["begin_scenario"]`);
-        checkEqual(beginReply.toString(), `["success"]`);
+        shouldEqual(beginReply.toString(), `["success"]`);
 
         funcCalls = [];
         const invokeReply = jsonReply(`["invoke", {"id": "` ~ id ~ `", "args": []}]`);
-        checkEqual(funcCalls, ["pending2"]);
-        checkEqual(invokeReply[0], "pending");
-        checkEqual(invokeReply[1], "But I'm le tired");
+        shouldEqual(funcCalls, ["pending2"]);
+        shouldEqual(invokeReply[0], "pending");
+        shouldEqual(invokeReply[1], "But I'm le tired");
     }
 }
 
@@ -140,19 +141,19 @@ void testInvokePass() {
     writelnUt("Reply: ", matchesReply);
 
     const beginReply = jsonReply(`["begin_scenario"]`);
-    checkEqual(beginReply.toString(), `["success"]`);
+    shouldEqual(beginReply.toString(), `["success"]`);
 
     funcCalls = [];
-    const id = matchesReply[1][0].id.to!string;
+    const id = matchesReply[1][0]["id"].to!string;
     const invokeReply = jsonReply(`["invoke", {"id": "` ~ id ~ `", "args": []}]`);
     writelnUt("Reply: ", invokeReply);
 
-    checkEqual(funcCalls, ["match1"]);
-    checkEqual(invokeReply[0], "success");
-    checkEqual(invokeReply.length, 1);
+    shouldEqual(funcCalls, ["match1"]);
+    shouldEqual(invokeReply[0], "success");
+    shouldEqual(invokeReply.length, 1);
 
     const endReply = jsonReply(`["end_scenario"]`);
-    checkEqual(endReply.toString(), `["success"]`);
+    shouldEqual(endReply.toString(), `["success"]`);
 }
 
 class TestException: Exception {
@@ -173,20 +174,20 @@ void testInvokeFail() {
     writelnUt("Reply: ", matchesReply);
 
     const beginReply = jsonReply(`["begin_scenario"]`);
-    checkEqual(beginReply.toString(), `["success"]`);
+    shouldEqual(beginReply.toString(), `["success"]`);
 
     funcCalls = [];
-    const id = matchesReply[1][0].id.to!string;
+    const id = matchesReply[1][0]["id"].to!string;
     const invokeReply = jsonReply(`["invoke", {"id": "` ~ id ~ `", "args": []}]`);
     writelnUt("Reply: ", invokeReply);
 
     writelnUt("Start of the checks");
-    checkEqual(funcCalls, ["gonna fail"]);
-    checkEqual(invokeReply.length, 2);
-    checkEqual(invokeReply[0], "fail");
-    checkEqual(invokeReply[1].message.to!string, "I did it again");
-    checkEqual(invokeReply[1].exception.to!string, "tests.server.TestException");
+    shouldEqual(funcCalls, ["gonna fail"]);
+    shouldEqual(invokeReply.length, 2);
+    shouldEqual(invokeReply[0], "fail");
+    shouldEqual(invokeReply[1]["message"].to!string, "I did it again");
+    shouldEqual(invokeReply[1]["exception"].to!string, "tests.server.TestException");
 
     const endReply = jsonReply(`["end_scenario"]`);
-    checkEqual(endReply.toString(), `["success"]`);
+    shouldEqual(endReply.toString(), `["success"]`);
 }

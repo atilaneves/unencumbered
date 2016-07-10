@@ -21,7 +21,7 @@ void calculatorComputesPi() {
 @Then(r"^the calculator returns PI$")
 void calculatorReturns() {
     debug writeln("returns pi");
-    checkTrue(closeEnough(calculator.result, PI));
+    shouldBeTrue(closeEnough(calculator.result, PI));
 }
 
 @When(`^the calculator adds up "?([0-9.]+)"? and "?([0-9.]+)"?$`)
@@ -44,11 +44,11 @@ void whenAdds3(in double a, in double b, in double c) {
 
 @But(r"^the calculator does not return 3$")
 void butDoesNot() {
-    checkFalse(closeEnough(calculator.result, 3));
+    shouldBeFalse(closeEnough(calculator.result, 3));
 }
 
 @Then(`^the calculator returns "(.+)"`)
 void thenReturnsPi(in string a) {
     debug writeln("returns capture");
-    checkTrue(closeEnough(calculator.result, a.to!double));
+    shouldBeTrue(closeEnough(calculator.result, a.to!double));
 }

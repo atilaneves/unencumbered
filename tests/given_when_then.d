@@ -30,13 +30,13 @@ void failingStep() {
 void testGivenUndefinedWithNoMapping() {
     funcCalls = [];
     const results = runFeature!__MODULE__(["Non matching string"]);
-    checkEqual(results.numScenarios, 1);
-    checkEqual(results.numPassing, 0);
-    checkEqual(results.numFailing, 0);
-    checkEqual(results.numPending, 0);
-    checkEqual(results.numUndefined, 1);
-    checkEqual(results.toString(), "1 scenario (1 undefined)");
-    checkEqual(funcCalls, []);
+    shouldEqual(results.numScenarios, 1);
+    shouldEqual(results.numPassing, 0);
+    shouldEqual(results.numFailing, 0);
+    shouldEqual(results.numPending, 0);
+    shouldEqual(results.numUndefined, 1);
+    shouldEqual(results.toString(), "1 scenario (1 undefined)");
+    shouldEqual(funcCalls, []);
 }
 
 void testGivenWhenThen() {
@@ -45,11 +45,11 @@ void testGivenWhenThen() {
                                            "    Given A situation",
                                            "    When I do this",
                                            "    Then This happens"]);
-    checkEqual(results.numScenarios, 1);
-    checkEqual(results.numPassing, 1);
-    checkEqual(results.numFailing, 0);
-    checkEqual(results.numPending, 0);
-    checkEqual(results.numUndefined, 0);
-    checkEqual(results.toString(), "1 scenario (1 passed)");
-    checkEqual(funcCalls, ["Given", "When", "Then"]);
+    shouldEqual(results.numScenarios, 1);
+    shouldEqual(results.numPassing, 1);
+    shouldEqual(results.numFailing, 0);
+    shouldEqual(results.numPending, 0);
+    shouldEqual(results.numUndefined, 0);
+    shouldEqual(results.toString(), "1 scenario (1 passed)");
+    shouldEqual(funcCalls, ["Given", "When", "Then"]);
 }

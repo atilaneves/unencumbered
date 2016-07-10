@@ -37,50 +37,50 @@ void testMatchPassing12() {
     matchFuncCalls = [];
     const results = runFeature!__MODULE__(["Feature: A feature", "  Scenario: A Scenario:",
                                            "I match a passing step", "I also match a passing step"]);
-    checkEqual(results.numScenarios, 1);
-    checkEqual(results.numPassing, 1);
-    checkEqual(results.numFailing, 0);
-    checkEqual(results.numPending, 0);
-    checkEqual(results.numUndefined, 0);
-    checkEqual(results.toString(), "1 scenario (1 passed)");
-    checkEqual(matchFuncCalls, ["passingStep1", "passingStep2"]);
+    shouldEqual(results.numScenarios, 1);
+    shouldEqual(results.numPassing, 1);
+    shouldEqual(results.numFailing, 0);
+    shouldEqual(results.numPending, 0);
+    shouldEqual(results.numUndefined, 0);
+    shouldEqual(results.toString(), "1 scenario (1 passed)");
+    shouldEqual(matchFuncCalls, ["passingStep1", "passingStep2"]);
 }
 
 void testMatchPassing3() {
     matchFuncCalls = [];
     const results = runFeature!__MODULE__(["What about me? I also pass"]);
-    checkEqual(results.numScenarios, 1);
-    checkEqual(results.numPassing, 1);
-    checkEqual(results.numFailing, 0);
-    checkEqual(results.numPending, 0);
-    checkEqual(results.numUndefined, 0);
-    checkEqual(results.toString(), "1 scenario (1 passed)");
-    checkEqual(matchFuncCalls, ["passingStep3"]);
+    shouldEqual(results.numScenarios, 1);
+    shouldEqual(results.numPassing, 1);
+    shouldEqual(results.numFailing, 0);
+    shouldEqual(results.numPending, 0);
+    shouldEqual(results.numUndefined, 0);
+    shouldEqual(results.toString(), "1 scenario (1 passed)");
+    shouldEqual(matchFuncCalls, ["passingStep3"]);
 }
 
 void testMatchNotPassing() {
     matchFuncCalls = [];
     const results = runFeature!__MODULE__(["I match a failing step"]);
-    checkEqual(results.numScenarios, 1);
-    checkEqual(results.numPassing, 0);
-    checkEqual(results.numFailing, 1);
-    checkEqual(results.numPending, 0);
-    checkEqual(results.numUndefined, 0);
-    checkEqual(results.toString(), "1 scenario (1 failed)");
-    checkEqual(matchFuncCalls, ["failingStep"]);
+    shouldEqual(results.numScenarios, 1);
+    shouldEqual(results.numPassing, 0);
+    shouldEqual(results.numFailing, 1);
+    shouldEqual(results.numPending, 0);
+    shouldEqual(results.numUndefined, 0);
+    shouldEqual(results.toString(), "1 scenario (1 failed)");
+    shouldEqual(matchFuncCalls, ["failingStep"]);
 }
 
 
 void testUndefinedWithWrongString() {
     matchFuncCalls = [];
     const results = runFeature!__MODULE__(["totally invented string"]);
-    checkEqual(results.numScenarios, 1);
-    checkEqual(results.numPassing, 0);
-    checkEqual(results.numFailing, 0);
-    checkEqual(results.numPending, 0);
-    checkEqual(results.numUndefined, 1);
-    checkEqual(results.toString(), "1 scenario (1 undefined)");
-    checkEqual(matchFuncCalls, []);
+    shouldEqual(results.numScenarios, 1);
+    shouldEqual(results.numPassing, 0);
+    shouldEqual(results.numFailing, 0);
+    shouldEqual(results.numPending, 0);
+    shouldEqual(results.numUndefined, 1);
+    shouldEqual(results.toString(), "1 scenario (1 undefined)");
+    shouldEqual(matchFuncCalls, []);
 }
 
 
@@ -92,10 +92,10 @@ void pendingStep() {
 void testPending() {
     matchFuncCalls = [];
     const results = runFeature!__MODULE__(["Gotta match pending"]);
-    checkEqual(results.numScenarios, 1);
-    checkEqual(results.numPassing, 0);
-    checkEqual(results.numFailing, 0);
-    checkEqual(results.numPending, 1);
-    checkEqual(results.toString(), "1 scenario (1 pending)");
-    checkEqual(matchFuncCalls, []);
+    shouldEqual(results.numScenarios, 1);
+    shouldEqual(results.numPassing, 0);
+    shouldEqual(results.numFailing, 0);
+    shouldEqual(results.numPending, 1);
+    shouldEqual(results.toString(), "1 scenario (1 pending)");
+    shouldEqual(matchFuncCalls, []);
 }

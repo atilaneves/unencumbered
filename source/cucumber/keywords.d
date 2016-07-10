@@ -19,6 +19,7 @@ alias But = Match;
 
 string stripCucumberKeywords(string str) {
     string stripImpl(string str, in string keyword) {
+        import std.array;
         str = str.stripLeft;
         if(str.startsWith(keyword)) {
             return std.array.replace(str, keyword, "");

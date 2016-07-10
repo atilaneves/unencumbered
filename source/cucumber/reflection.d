@@ -90,7 +90,7 @@ auto findSteps(ModuleNames...)() if(allSatisfy!(isSomeString, (typeof(ModuleName
     foreach(mod; ModuleNames) {
         foreach(member; __traits(allMembers, mixin(mod))) {
 
-            enum compiles = __traits(compiles, mixin(member));
+            enum compiles = __traits(compiles, mixin(member ~ `()`));
 
             static if(compiles) {
 

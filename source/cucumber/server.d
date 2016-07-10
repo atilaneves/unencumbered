@@ -42,6 +42,8 @@ private void handleTcpRequest(ModuleNames...)(TCPConnection tcpConnection, in st
 }
 
 string handleRequest(ModuleNames...)(string request, in DetailsFlag details = No.details) {
+    import cucumber.feature: sanitize;
+
     debug writeln("Request: ", request);
     const fail = `["fail"]`;
 
@@ -69,12 +71,12 @@ private string handleStepMatches(ModuleNames...)(in Json json, in DetailsFlag de
     gMatches[func.id] = func;
 
     auto infoElem = Json.emptyObject;
-    infoElem.id = func.id.to!string;
-    infoElem.args = Json.emptyArray;
+    infoElem["id"] = func.id.to!string;
+    infoElem["args"] = Json.emptyArray;
 
     if(details) {
-        infoElem.regexp = func.regex;
-        infoElem.source = func.source;
+        infoElem["regexp"] = func.regex;
+        infoElem["source"] = func.source;
     }
 
     auto info = Json.emptyArray;
@@ -87,7 +89,7 @@ private string handleStepMatches(ModuleNames...)(in Json json, in DetailsFlag de
 private string handleInvoke (in Json json) {
     debug writeln("handleInvoke for json ", json);
     const invokeArgs = json[1];
-    const id = invokeArgs.id.to!int;
+    const id = invokeArgs["id"].to!int;
     if(id !in gMatches) throw new Exception(text("Could not find match for id ", id));
     try {
         gMatches[id]();
